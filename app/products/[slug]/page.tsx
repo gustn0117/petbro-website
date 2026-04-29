@@ -189,6 +189,29 @@ export default async function ProductDetailPage({
           </div>
         </div>
 
+        {/* Product detail images (long scroll description) */}
+        {product.detail_images && product.detail_images.length > 0 && (
+          <div className="mt-24 border-t border-black/10 pt-16 md:mt-32 md:pt-24">
+            <div className="mb-10 text-center">
+              <p className="eyebrow justify-center text-brand">PRODUCT DETAIL</p>
+              <h2 className="mt-3 text-2xl font-extrabold tracking-tightest text-ink md:text-3xl">
+                상세 정보
+              </h2>
+            </div>
+            <div className="mx-auto max-w-3xl space-y-1.5">
+              {product.detail_images.map((src, i) => (
+                <img
+                  key={`${src}-${i}`}
+                  src={src}
+                  alt={`${product.name} 상세 이미지 ${i + 1}`}
+                  loading="lazy"
+                  className="block w-full"
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Related products */}
         {related.length > 0 && (
           <div className="mt-24 border-t border-black/10 pt-16 md:mt-32 md:pt-24">

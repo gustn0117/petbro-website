@@ -37,6 +37,7 @@ async function createProduct(values: ProductFormValues) {
       price: values.price,
       stock: values.stock,
       images: values.images,
+      detail_images: values.detail_images,
       status: values.status,
       display_order: values.display_order,
     })

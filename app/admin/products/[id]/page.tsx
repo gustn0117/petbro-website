@@ -46,6 +46,7 @@ async function updateProduct(values: ProductFormValues) {
       price: values.price,
       stock: values.stock,
       images: values.images,
+      detail_images: values.detail_images,
       status: values.status,
       display_order: values.display_order,
       updated_at: new Date().toISOString(),
@@ -79,6 +80,7 @@ export default async function EditProductPage({
     price: product.price,
     stock: product.stock,
     images: product.images || [],
+    detail_images: product.detail_images || [],
     status: product.status,
     display_order: product.display_order,
   };

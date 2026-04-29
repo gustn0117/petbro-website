@@ -34,6 +34,7 @@ export type Product = {
   price: number;
   stock: number;
   images: string[];
+  detail_images: string[];
   status: "active" | "draft" | "archived";
   display_order: number;
   created_at: string;
