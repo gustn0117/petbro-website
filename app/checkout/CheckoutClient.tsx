@@ -9,14 +9,22 @@ import { loadTossPayments } from "@tosspayments/payment-sdk";
 const SHIPPING_FEE = 3000;
 const FREE_SHIPPING_OVER = 50000;
 
-export default function CheckoutClient() {
+export default function CheckoutClient({
+  defaultName = "",
+  defaultEmail = "",
+  defaultPhone = "",
+}: {
+  defaultName?: string;
+  defaultEmail?: string;
+  defaultPhone?: string;
+}) {
   const router = useRouter();
   const { items, subtotal, hydrated, clear } = useCart();
 
   const [form, setForm] = useState({
-    customer_name: "",
-    customer_phone: "",
-    customer_email: "",
+    customer_name: defaultName,
+    customer_phone: defaultPhone,
+    customer_email: defaultEmail,
     postcode: "",
     address: "",
     address_detail: "",

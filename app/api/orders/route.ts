@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getUserIdFromCookie } from "@/lib/customer-auth";
 
 const SHIPPING_FEE = 3000;
 const FREE_SHIPPING_OVER = 50000;
@@ -25,6 +26,14 @@ function genOrderNumber() {
 }
 
 export async function POST(req: Request) {
+  const userId = getUserIdFromCookie();
+  if (!userId) {
+    return NextResponse.json(
+      { error: "로그인이 필요합니다." },
+      { status: 401 },
+    );
+  }
+
   let body: Body;
   try {
     body = await req.json();
@@ -104,6 +113,7 @@ export async function POST(req: Request) {
     .from("orders")
     .insert({
       order_number,
+      user_id: userId,
       customer_name: body.customer_name.trim(),
       customer_phone: body.customer_phone.trim(),
       customer_email: body.customer_email?.trim() || null,

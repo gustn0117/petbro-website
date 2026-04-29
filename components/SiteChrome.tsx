@@ -6,7 +6,19 @@ import Footer from "./Footer";
 import RevealOnScroll from "./RevealOnScroll";
 import CartDrawer from "./cart/CartDrawer";
 
-export default function SiteChrome({ children }: { children: React.ReactNode }) {
+export type ChromeUser = {
+  id: string;
+  email: string;
+  name: string;
+} | null;
+
+export default function SiteChrome({
+  children,
+  user,
+}: {
+  children: React.ReactNode;
+  user: ChromeUser;
+}) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
 
@@ -16,11 +28,11 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
 
   return (
     <>
-      <Header />
+      <Header user={user} />
       <main className="relative">{children}</main>
       <Footer />
       <RevealOnScroll />
-      <CartDrawer />
+      <CartDrawer authed={!!user} />
     </>
   );
 }

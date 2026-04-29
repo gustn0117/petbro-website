@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { supabasePublic, type Product } from "@/lib/supabase";
 import AddToCartButton from "@/components/cart/AddToCartButton";
+import { getCurrentUser } from "@/lib/customer-auth";
 
 export const metadata: Metadata = {
   title: "제품 · SHOP | PAT BRO 펫브로",
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
     "100% 국내산 한우만 사용하는 프리미엄 수제 우스틱. 7가지 시그니처 라인업.",
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 async function getProducts(): Promise<Product[]> {
   const { data, error } = await supabasePublic
@@ -25,7 +26,8 @@ async function getProducts(): Promise<Product[]> {
 }
 
 export default async function ProductsPage() {
-  const products = await getProducts();
+  const [products, user] = await Promise.all([getProducts(), getCurrentUser()]);
+  const authed = !!user;
 
   return (
     <section className="relative overflow-hidden bg-white pb-24 pt-28 md:pb-32 md:pt-36 lg:pb-40 lg:pt-44">
@@ -162,10 +164,21 @@ export default async function ProductsPage() {
                       </p>
                     )}
                   </div>
-                  <p className="shrink-0 text-base font-extrabold tracking-tightest text-ink md:text-lg">
-                    {p.price.toLocaleString()}
-                    <span className="ml-0.5 text-xs font-semibold text-ink/60">원</span>
-                  </p>
+                  {authed ? (
+                    <p className="shrink-0 text-base font-extrabold tracking-tightest text-ink md:text-lg">
+                      {p.price.toLocaleString()}
+                      <span className="ml-0.5 text-xs font-semibold text-ink/60">
+                        원
+                      </span>
+                    </p>
+                  ) : (
+                    <Link
+                      href={`/login?redirect=/products`}
+                      className="shrink-0 rounded-full bg-ink/5 px-3 py-1 text-[11px] font-semibold text-ink/65 transition hover:bg-ink hover:text-white"
+                    >
+                      로그인 후 확인
+                    </Link>
+                  )}
                 </div>
 
                 {p.tags.length > 0 && (
@@ -189,6 +202,8 @@ export default async function ProductsPage() {
                     }}
                     disabled={p.stock <= 0}
                     variant="compact"
+                    authed={authed}
+                    redirectFrom="/products"
                   />
                 </div>
               </article>

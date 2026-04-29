@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabasePublic, type Product } from "@/lib/supabase";
 import AddToCartButton from "@/components/cart/AddToCartButton";
+import { getCurrentUser } from "@/lib/customer-auth";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 async function getProduct(slug: string): Promise<Product | null> {
   const { data, error } = await supabasePublic
@@ -48,8 +49,12 @@ export default async function ProductDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const product = await getProduct(params.slug);
+  const [product, user] = await Promise.all([
+    getProduct(params.slug),
+    getCurrentUser(),
+  ]);
   if (!product || product.status !== "active") notFound();
+  const authed = !!user;
 
   const related = await getRelated(params.slug);
 
@@ -109,12 +114,29 @@ export default async function ProductDetailPage({
               <p className="mt-3 text-sm text-ink/60">{product.spec}</p>
             )}
 
-            <div className="mt-8 flex items-baseline gap-3">
-              <p className="font-display text-4xl font-extrabold tracking-tightest text-ink md:text-5xl">
-                {product.price.toLocaleString()}
-              </p>
-              <span className="text-2xl font-semibold text-ink/70">원</span>
-            </div>
+            {authed ? (
+              <div className="mt-8 flex items-baseline gap-3">
+                <p className="font-display text-4xl font-extrabold tracking-tightest text-ink md:text-5xl">
+                  {product.price.toLocaleString()}
+                </p>
+                <span className="text-2xl font-semibold text-ink/70">원</span>
+              </div>
+            ) : (
+              <div className="mt-8">
+                <Link
+                  href={`/login?redirect=/products/${product.slug}`}
+                  className="group inline-flex items-center gap-2 rounded-full bg-ink/[0.04] px-5 py-3 text-sm font-semibold text-ink transition hover:bg-ink hover:text-white"
+                >
+                  로그인 후 가격 확인
+                  <span className="transition-transform group-hover:translate-x-1">
+                    →
+                  </span>
+                </Link>
+                <p className="mt-2 text-xs text-ink/50">
+                  PAT BRO 회원 전용으로 가격이 안내됩니다.
+                </p>
+              </div>
+            )}
 
             {product.tags.length > 0 && (
               <div className="mt-6 flex flex-wrap gap-2">
@@ -144,6 +166,8 @@ export default async function ProductDetailPage({
                 disabled={product.stock <= 0}
                 showQuantity
                 variant="primary"
+                authed={authed}
+                redirectFrom={`/products/${product.slug}`}
               />
 
               <p className="text-center text-xs text-ink/50">
@@ -201,9 +225,15 @@ export default async function ProductDetailPage({
                   <p className="mt-4 truncate text-sm font-semibold text-ink group-hover:text-brand">
                     {p.name}
                   </p>
-                  <p className="mt-1 text-sm font-bold text-ink">
-                    {p.price.toLocaleString()}원
-                  </p>
+                  {authed ? (
+                    <p className="mt-1 text-sm font-bold text-ink">
+                      {p.price.toLocaleString()}원
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-xs font-semibold text-ink/55">
+                      로그인 후 확인 →
+                    </p>
+                  )}
                 </Link>
               ))}
             </div>

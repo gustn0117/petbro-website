@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import SiteChrome from "@/components/SiteChrome";
 import { CartProvider } from "@/components/cart/CartProvider";
+import { getCurrentUser } from "@/lib/customer-auth";
 
 export const metadata: Metadata = {
   title: "PAT BRO 펫브로 — 위생을 최우선시 하는 애견간식 제조업체",
@@ -26,16 +27,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const user = await getCurrentUser();
   return (
     <html lang="ko">
       <body className="bg-white text-ink antialiased">
         <CartProvider>
-          <SiteChrome>{children}</SiteChrome>
+          <SiteChrome user={user}>{children}</SiteChrome>
         </CartProvider>
       </body>
     </html>

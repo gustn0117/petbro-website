@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useCart } from "./CartProvider";
 
@@ -16,22 +17,35 @@ export default function AddToCartButton({
   disabled,
   variant = "primary",
   showQuantity = false,
+  authed,
+  redirectFrom,
 }: {
   product: ProductInput;
   disabled?: boolean;
   variant?: "primary" | "compact";
   showQuantity?: boolean;
+  authed?: boolean;
+  redirectFrom?: string;
 }) {
+  const router = useRouter();
   const { add } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
   const handleAdd = () => {
     if (disabled) return;
+    if (authed === false) {
+      router.push(
+        `/login${redirectFrom ? `?redirect=${encodeURIComponent(redirectFrom)}` : ""}`,
+      );
+      return;
+    }
     add(product, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
+
+  const lockedLabel = authed === false ? "로그인 후 구매" : null;
 
   if (variant === "compact") {
     return (
@@ -40,14 +54,16 @@ export default function AddToCartButton({
         disabled={disabled}
         className="w-full rounded-full border border-ink/15 bg-white py-3 text-sm font-semibold tracking-[0.1em] text-ink transition hover:border-ink hover:bg-ink hover:text-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white disabled:hover:text-ink"
       >
-        {disabled ? "품절" : added ? "✓ 담았습니다" : "장바구니 담기"}
+        {disabled
+          ? "품절"
+          : lockedLabel || (added ? "✓ 담았습니다" : "장바구니 담기")}
       </button>
     );
   }
 
   return (
     <div className="flex items-stretch gap-3">
-      {showQuantity && (
+      {showQuantity && authed !== false && (
         <div className="inline-flex items-center rounded-full border border-ink/15 bg-white">
           <button
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -76,7 +92,9 @@ export default function AddToCartButton({
         className="flex-1 rounded-full bg-ink px-6 py-4 text-sm font-semibold tracking-[0.14em] text-white transition hover:bg-brand disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-ink"
         type="button"
       >
-        {disabled ? "품절" : added ? "✓ 장바구니에 담았습니다" : "장바구니 담기"}
+        {disabled
+          ? "품절"
+          : lockedLabel || (added ? "✓ 장바구니에 담았습니다" : "장바구니 담기")}
       </button>
     </div>
   );
