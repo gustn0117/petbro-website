@@ -76,30 +76,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Bottom marquee */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 overflow-hidden border-t border-white/10 bg-ink/40 py-4 backdrop-blur-sm">
-        <div className="flex animate-marquee whitespace-nowrap">
-          {Array.from({ length: 2 }).map((_, idx) => (
-            <div key={idx} className="flex shrink-0 items-center gap-12 px-6 text-xs font-semibold tracking-[0.3em] text-white/70">
-              <span>100% 국내산 한우</span>
-              <span className="text-brand-300">●</span>
-              <span>특허 제조 기술</span>
-              <span className="text-brand-300">●</span>
-              <span>국내 최대 축산물 공판장 직거래</span>
-              <span className="text-brand-300">●</span>
-              <span>2022 부산시 유망업종 선정</span>
-              <span className="text-brand-300">●</span>
-              <span>동물사랑 천사기업</span>
-              <span className="text-brand-300">●</span>
-              <span>HANDMADE WITH LOVE</span>
-              <span className="text-brand-300">●</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Scroll indicator */}
-      <div className="absolute bottom-24 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex">
+      <div className="absolute bottom-12 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex">
         <span className="text-[10px] font-semibold tracking-[0.3em] text-white/60">
           SCROLL
         </span>
