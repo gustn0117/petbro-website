@@ -54,7 +54,7 @@ export default async function ProductDetailPage({
     getCurrentUser(),
   ]);
   if (!product || product.status !== "active") notFound();
-  const authed = !!user;
+  const approved = !!user && user.status === "approved";
 
   const related = await getRelated(params.slug);
 
@@ -114,7 +114,7 @@ export default async function ProductDetailPage({
               <p className="mt-3 text-sm text-ink/60">{product.spec}</p>
             )}
 
-            {authed ? (
+            {approved ? (
               <div className="mt-8 flex items-baseline gap-3">
                 <p className="font-display text-4xl font-extrabold tracking-tightest text-ink md:text-5xl">
                   {product.price.toLocaleString()}
@@ -166,7 +166,7 @@ export default async function ProductDetailPage({
                 disabled={product.stock <= 0}
                 showQuantity
                 variant="primary"
-                authed={authed}
+                authed={approved}
                 redirectFrom={`/products/${product.slug}`}
               />
 
@@ -248,7 +248,7 @@ export default async function ProductDetailPage({
                   <p className="mt-4 truncate text-sm font-semibold text-ink group-hover:text-brand">
                     {p.name}
                   </p>
-                  {authed ? (
+                  {approved ? (
                     <p className="mt-1 text-sm font-bold text-ink">
                       {p.price.toLocaleString()}원
                     </p>

@@ -27,7 +27,7 @@ async function getProducts(): Promise<Product[]> {
 
 export default async function ProductsPage() {
   const [products, user] = await Promise.all([getProducts(), getCurrentUser()]);
-  const authed = !!user;
+  const approved = !!user && user.status === "approved";
 
   return (
     <section className="relative overflow-hidden bg-white pb-24 pt-28 md:pb-32 md:pt-36 lg:pb-40 lg:pt-44">
@@ -164,7 +164,7 @@ export default async function ProductsPage() {
                       </p>
                     )}
                   </div>
-                  {authed ? (
+                  {approved ? (
                     <p className="shrink-0 text-base font-extrabold tracking-tightest text-ink md:text-lg">
                       {p.price.toLocaleString()}
                       <span className="ml-0.5 text-xs font-semibold text-ink/60">
@@ -202,7 +202,7 @@ export default async function ProductsPage() {
                     }}
                     disabled={p.stock <= 0}
                     variant="compact"
-                    authed={authed}
+                    authed={approved}
                     redirectFrom="/products"
                   />
                 </div>

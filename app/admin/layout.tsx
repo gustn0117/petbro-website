@@ -28,6 +28,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <nav className="hidden items-center gap-1 md:flex">
             <AdminNavLink href="/admin/products" label="상품" />
             <AdminNavLink href="/admin/orders" label="주문" />
+            <AdminNavLink href="/admin/users" label="회원" />
           </nav>
 
           <div className="flex items-center gap-3">
@@ -51,6 +52,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <nav className="flex items-center gap-1 border-t border-black/5 px-6 md:hidden">
           <AdminNavLink href="/admin/products" label="상품" />
           <AdminNavLink href="/admin/orders" label="주문" />
+          <AdminNavLink href="/admin/users" label="회원" />
         </nav>
       </header>
 

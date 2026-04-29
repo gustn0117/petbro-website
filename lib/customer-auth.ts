@@ -19,6 +19,16 @@ export type SessionUser = {
   email: string;
   name: string;
   phone: string | null;
+  status: "pending" | "approved" | "rejected";
+  business_name: string | null;
+  business_number: string | null;
+  business_owner: string | null;
+  business_address: string | null;
+  business_type: string | null;
+  business_item: string | null;
+  tax_email: string | null;
+  is_simplified_tax: boolean;
+  reject_reason: string | null;
 };
 
 function sign(payload: string) {
@@ -75,7 +85,9 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
 
   const { data, error } = await supabaseAdmin()
     .from("users")
-    .select("id, email, name, phone")
+    .select(
+      "id, email, name, phone, status, business_name, business_number, business_owner, business_address, business_type, business_item, tax_email, is_simplified_tax, reject_reason",
+    )
     .eq("id", userId)
     .maybeSingle();
 

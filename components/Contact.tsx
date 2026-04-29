@@ -27,15 +27,15 @@ export default function Contact() {
             </p>
 
             <div className="mt-12 space-y-px bg-white/5">
-              <ContactRow label="WHOLESALE" value="010-2466-2313" href="tel:010-2466-2313" />
+              <ContactRow label="WHOLESALE" value="010-7721-4150" href="tel:010-7721-4150" />
               <ContactRow
                 label="ADDRESS"
                 value="부산광역시 사상구 괘감로 98-1 펫브로"
               />
               <ContactRow
                 label="INSTAGRAM"
-                value="@unni_dog_2017 · @unnidog_2017"
-                href="https://www.instagram.com/unni_dog_2017"
+                value="@patbro_company · @patbro_company"
+                href="https://www.instagram.com/patbro_company"
               />
               <ContactRow
                 label="NAVER"

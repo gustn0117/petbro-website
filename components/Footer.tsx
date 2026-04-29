@@ -20,9 +20,9 @@ const NAV_GROUPS = [
     title: "고객지원",
     links: [
       { href: "/contact", label: "문의" },
-      { href: "tel:010-2466-2313", label: "010-2466-2313", ext: true },
+      { href: "tel:010-7721-4150", label: "010-7721-4150", ext: true },
       {
-        href: "https://www.instagram.com/unni_dog_2017",
+        href: "https://www.instagram.com/patbro_company",
         label: "Instagram",
         ext: true,
       },

@@ -9,17 +9,30 @@ import { loadTossPayments } from "@tosspayments/payment-sdk";
 const SHIPPING_FEE = 3000;
 const FREE_SHIPPING_OVER = 50000;
 
+type TaxInfo = {
+  business_name: string;
+  business_number: string;
+  business_owner: string;
+  tax_email: string;
+  is_simplified_tax: boolean;
+};
+
 export default function CheckoutClient({
   defaultName = "",
   defaultEmail = "",
   defaultPhone = "",
+  taxInfo,
 }: {
   defaultName?: string;
   defaultEmail?: string;
   defaultPhone?: string;
+  taxInfo?: TaxInfo;
 }) {
   const router = useRouter();
   const { items, subtotal, hydrated, clear } = useCart();
+  const [issueTaxInvoice, setIssueTaxInvoice] = useState(
+    taxInfo ? !taxInfo.is_simplified_tax : true,
+  );
 
   const [form, setForm] = useState({
     customer_name: defaultName,
@@ -67,6 +80,7 @@ export default function CheckoutClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          issue_tax_invoice: issueTaxInvoice,
           items: items.map((i) => ({
             product_id: i.product_id,
             quantity: i.quantity,
@@ -161,6 +175,52 @@ export default function CheckoutClient({
                 </Field>
               </div>
             </Card>
+
+            {/* Tax invoice info (read-only summary from member profile) */}
+            {taxInfo && (
+              <Card title="세금계산서 정보">
+                {taxInfo.is_simplified_tax ? (
+                  <div className="rounded-xl bg-ink/[0.04] px-4 py-3 text-sm text-ink/70">
+                    회원 정보에 <strong className="text-ink">간이과세자</strong>로
+                    등록되어 있어 세금계산서가 발행되지 않습니다.
+                  </div>
+                ) : (
+                  <>
+                    <p className="mb-3 text-xs leading-relaxed text-ink/55">
+                      회원가입 시 입력하신 정보로 자동 발행됩니다. 변경이 필요하면
+                      010-7721-4150 으로 문의해주세요.
+                    </p>
+                    <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                      <ReadOnly label="상호" value={taxInfo.business_name || "-"} />
+                      <ReadOnly
+                        label="사업자번호"
+                        value={taxInfo.business_number || "-"}
+                        mono
+                      />
+                      <ReadOnly
+                        label="대표자"
+                        value={taxInfo.business_owner || "-"}
+                      />
+                      <ReadOnly
+                        label="발행 이메일"
+                        value={taxInfo.tax_email || "-"}
+                      />
+                    </dl>
+                    <label className="mt-4 flex cursor-pointer items-start gap-2.5 border-t border-ink/10 pt-4">
+                      <input
+                        type="checkbox"
+                        checked={issueTaxInvoice}
+                        onChange={(e) => setIssueTaxInvoice(e.target.checked)}
+                        className="mt-1 h-4 w-4 accent-ink"
+                      />
+                      <span className="text-sm leading-relaxed text-ink/80">
+                        이번 주문 세금계산서 발행
+                      </span>
+                    </label>
+                  </>
+                )}
+              </Card>
+            )}
 
             <Card title="배송지">
               <div className="space-y-4">
@@ -330,6 +390,27 @@ function Field({
       </span>
       <div className="mt-1.5">{children}</div>
     </label>
+  );
+}
+
+function ReadOnly({
+  label,
+  value,
+  mono,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+}) {
+  return (
+    <div>
+      <dt className="text-[11px] font-semibold tracking-[0.2em] text-ink/55">
+        {label}
+      </dt>
+      <dd className={`mt-1 text-sm font-semibold text-ink ${mono ? "font-mono" : ""}`}>
+        {value}
+      </dd>
+    </div>
   );
 }
 

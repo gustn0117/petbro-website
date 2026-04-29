@@ -13,6 +13,7 @@ type Body = {
   address?: string;
   address_detail?: string;
   memo?: string;
+  issue_tax_invoice?: boolean;
   items?: { product_id: string; quantity: number }[];
 };
 
@@ -31,6 +32,28 @@ export async function POST(req: Request) {
     return NextResponse.json(
       { error: "로그인이 필요합니다." },
       { status: 401 },
+    );
+  }
+
+  // Check approval + load tax info
+  const { data: userRow } = await supabaseAdmin()
+    .from("users")
+    .select(
+      "status, business_name, business_number, tax_email, is_simplified_tax",
+    )
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (!userRow) {
+    return NextResponse.json(
+      { error: "회원 정보를 찾을 수 없습니다." },
+      { status: 401 },
+    );
+  }
+  if (userRow.status !== "approved") {
+    return NextResponse.json(
+      { error: "관리자 승인 후 주문이 가능합니다." },
+      { status: 403 },
     );
   }
 
@@ -109,6 +132,11 @@ export async function POST(req: Request) {
   const total = subtotal + shipping_fee;
   const order_number = genOrderNumber();
 
+  // Tax invoice: never issue for simplified-tax users; otherwise honor request flag
+  const issueTaxInvoice = userRow.is_simplified_tax
+    ? false
+    : body.issue_tax_invoice !== false;
+
   const { data: created, error: insertError } = await supabaseAdmin()
     .from("orders")
     .insert({
@@ -126,6 +154,10 @@ export async function POST(req: Request) {
       total,
       payment_status: "pending",
       memo: body.memo?.trim() || null,
+      issue_tax_invoice: issueTaxInvoice,
+      tax_email: issueTaxInvoice ? userRow.tax_email : null,
+      business_name: issueTaxInvoice ? userRow.business_name : null,
+      business_number: issueTaxInvoice ? userRow.business_number : null,
     })
     .select("id, order_number, total")
     .single();

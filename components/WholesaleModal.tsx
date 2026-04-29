@@ -102,7 +102,7 @@ export default function WholesaleModal({
           {/* Channels */}
           <div className="mt-6 grid gap-2.5">
             <a
-              href="tel:010-2466-2313"
+              href="tel:010-7721-4150"
               className="group flex items-center justify-between rounded-2xl bg-ink px-5 py-4 text-white transition hover:bg-brand"
             >
               <span className="flex items-center gap-3">
@@ -124,7 +124,7 @@ export default function WholesaleModal({
                     전화 문의
                   </span>
                   <span className="block text-base font-extrabold tracking-tightest">
-                    010-2466-2313
+                    010-7721-4150
                   </span>
                 </span>
               </span>
@@ -134,7 +134,7 @@ export default function WholesaleModal({
             </a>
 
             <a
-              href="https://www.instagram.com/unni_dog_2017"
+              href="https://www.instagram.com/patbro_company"
               target="_blank"
               rel="noreferrer"
               className="group flex items-center justify-between rounded-2xl border border-ink/12 bg-white px-5 py-4 text-ink transition hover:border-ink hover:bg-ink/[0.03]"
@@ -159,7 +159,7 @@ export default function WholesaleModal({
                   <span className="block text-[10px] font-semibold tracking-[0.3em] text-ink/55">
                     DM 문의
                   </span>
-                  <span className="block text-sm font-bold">@unni_dog_2017</span>
+                  <span className="block text-sm font-bold">@patbro_company</span>
                 </span>
               </span>
               <span className="text-sm transition-transform group-hover:translate-x-1">

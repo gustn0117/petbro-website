@@ -42,7 +42,7 @@ export default async function OrderSuccessPage({
       <p className="mt-6 text-sm text-ink/60">
         주문 내역과 배송 정보는 입력하신 연락처로 안내됩니다.
         <br />
-        도매·기타 문의는 010-2466-2313로 연락주세요.
+        도매·기타 문의는 010-7721-4150로 연락주세요.
       </p>
     </ResultLayout>
   );

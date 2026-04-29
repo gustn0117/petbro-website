@@ -140,10 +140,10 @@ export default function About() {
                 </dt>
                 <dd className="mt-1.5">
                   <a
-                    href="tel:010-2466-2313"
+                    href="tel:010-7721-4150"
                     className="text-sm font-semibold text-ink transition hover:text-brand"
                   >
-                    010-2466-2313
+                    010-7721-4150
                   </a>
                 </dd>
               </div>

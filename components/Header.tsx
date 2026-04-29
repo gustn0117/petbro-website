@@ -52,6 +52,7 @@ export default function Header({ user }: { user: ChromeUser }) {
   const solid = !isHome || scrolled;
 
   return (
+    <>
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
         solid
@@ -119,7 +120,7 @@ export default function Header({ user }: { user: ChromeUser }) {
                 : "border-white/60 text-white hover:bg-white hover:text-ink"
             }`}
           >
-            도매문의 010-2466-2313
+            도매문의 010-7721-4150
           </button>
 
           {/* Account */}
@@ -249,13 +250,21 @@ export default function Header({ user }: { user: ChromeUser }) {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      <WholesaleModal
+        open={wholesaleOpen}
+        onClose={() => setWholesaleOpen(false)}
+      />
+    </header>
+
+      {/* Mobile menu — must live OUTSIDE <header> because the header has
+          backdrop-filter, which creates a containing block for fixed
+          descendants and would otherwise clip the menu to header height. */}
       <div
-        className={`fixed inset-0 top-[72px] z-40 flex flex-col bg-white transition-all duration-500 lg:hidden ${
+        className={`fixed inset-0 top-[72px] z-[55] flex flex-col overflow-y-auto bg-white transition-all duration-500 lg:hidden ${
           open ? "opacity-100 pointer-events-auto" : "pointer-events-none opacity-0"
         }`}
       >
-        <nav className="flex flex-col gap-1 px-6 pt-10">
+        <nav className="flex flex-col gap-1 px-6 pt-10 pb-12">
           {NAV.map((item, i) => (
             <Link
               key={item.href}
@@ -283,7 +292,7 @@ export default function Header({ user }: { user: ChromeUser }) {
             }}
             className="mt-10 inline-flex items-center justify-center rounded-full bg-ink px-6 py-4 text-sm font-semibold tracking-[0.14em] text-white"
           >
-            도매문의 010-2466-2313
+            도매문의 010-7721-4150
           </button>
 
           {/* Account section (mobile) */}
@@ -329,11 +338,6 @@ export default function Header({ user }: { user: ChromeUser }) {
           </div>
         </nav>
       </div>
-
-      <WholesaleModal
-        open={wholesaleOpen}
-        onClose={() => setWholesaleOpen(false)}
-      />
-    </header>
+    </>
   );
 }

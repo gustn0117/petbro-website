@@ -171,10 +171,10 @@ export default function HomePage() {
                 <span className="transition-transform group-hover:translate-x-1">→</span>
               </Link>
               <a
-                href="tel:010-2466-2313"
+                href="tel:010-7721-4150"
                 className="group inline-flex w-full items-center justify-between rounded-full border border-white/35 px-7 py-4 text-sm font-semibold tracking-[0.14em] text-white transition-all hover:border-white hover:bg-white/10 md:w-auto md:min-w-[280px]"
               >
-                <span>010-2466-2313</span>
+                <span>010-7721-4150</span>
                 <span className="transition-transform group-hover:translate-x-1">→</span>
               </a>
             </div>

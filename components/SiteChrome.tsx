@@ -5,11 +5,14 @@ import Header from "./Header";
 import Footer from "./Footer";
 import RevealOnScroll from "./RevealOnScroll";
 import CartDrawer from "./cart/CartDrawer";
+import PendingBanner from "./PendingBanner";
 
 export type ChromeUser = {
   id: string;
   email: string;
   name: string;
+  status: "pending" | "approved" | "rejected";
+  reject_reason?: string | null;
 } | null;
 
 export default function SiteChrome({
@@ -26,13 +29,21 @@ export default function SiteChrome({
     return <>{children}</>;
   }
 
+  const showBanner = !!user && user.status !== "approved";
+
   return (
     <>
       <Header user={user} />
+      {showBanner && (
+        <PendingBanner
+          status={user!.status as "pending" | "rejected"}
+          reason={user!.reject_reason || null}
+        />
+      )}
       <main className="relative">{children}</main>
       <Footer />
       <RevealOnScroll />
-      <CartDrawer authed={!!user} />
+      <CartDrawer authed={!!user && user.status === "approved"} />
     </>
   );
 }
