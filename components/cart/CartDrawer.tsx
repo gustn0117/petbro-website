@@ -1,55 +1,99 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { useCart } from "./CartProvider";
 
 export default function CartDrawer() {
   const { items, isOpen, close, setQuantity, remove, subtotal, hydrated } =
     useCart();
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, close]);
+
   return (
     <>
       <div
-        className={`fixed inset-0 z-[60] bg-ink/40 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[60] bg-ink/50 backdrop-blur-sm transition-opacity duration-500 ${
           isOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={close}
         aria-hidden={!isOpen}
       />
       <aside
-        className={`fixed inset-y-0 right-0 z-[61] flex w-full max-w-md flex-col bg-white shadow-2xl transition-transform duration-500 ${
+        className={`fixed inset-y-0 right-0 z-[61] flex w-full max-w-md flex-col bg-white shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
         aria-label="장바구니"
+        aria-modal={isOpen}
       >
-        <header className="flex items-center justify-between border-b border-black/10 px-6 py-5">
-          <h2 className="font-display text-lg font-extrabold tracking-tightest">
-            CART · 장바구니
-          </h2>
+        <header className="flex items-center justify-between border-b border-black/8 px-6 py-5">
+          <div>
+            <p className="text-[10px] font-semibold tracking-[0.3em] text-ink/50">
+              CART
+            </p>
+            <h2 className="mt-1 font-display text-xl font-extrabold tracking-tightest">
+              장바구니
+            </h2>
+          </div>
           <button
             onClick={close}
             aria-label="장바구니 닫기"
-            className="text-ink/60 transition hover:text-ink"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-ink/60 transition hover:bg-ink/5 hover:text-ink"
           >
-            ✕
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            >
+              <path d="M6 6 18 18M18 6 6 18" />
+            </svg>
           </button>
         </header>
 
         <div className="flex-1 overflow-y-auto px-6 py-6">
           {!hydrated ? null : items.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
-              <div className="text-5xl">🛒</div>
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-cream">
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  className="text-ink/40"
+                >
+                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+              </div>
               <p className="mt-6 text-base font-semibold text-ink">
                 장바구니가 비어 있습니다.
               </p>
-              <p className="mt-2 text-sm text-ink/60">
+              <p className="mt-2 text-sm text-ink/55">
                 상품을 둘러보고 담아보세요.
               </p>
               <Link
                 href="/products"
                 onClick={close}
-                className="mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand"
+                className="mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-semibold tracking-[0.14em] text-white transition hover:bg-brand"
               >
                 상품 보러 가기 →
               </Link>
@@ -59,9 +103,13 @@ export default function CartDrawer() {
               {items.map((item) => (
                 <li
                   key={item.product_id}
-                  className="flex gap-4 border-b border-black/5 pb-5"
+                  className="flex gap-4 border-b border-black/5 pb-5 last:border-b-0 last:pb-0"
                 >
-                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-cream">
+                  <Link
+                    href={`/products/${item.slug}`}
+                    onClick={close}
+                    className="block h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-cream"
+                  >
                     {item.image && (
                       <img
                         src={item.image}
@@ -69,7 +117,7 @@ export default function CartDrawer() {
                         className="h-full w-full object-cover"
                       />
                     )}
-                  </div>
+                  </Link>
                   <div className="flex flex-1 flex-col">
                     <Link
                       href={`/products/${item.slug}`}
@@ -78,16 +126,16 @@ export default function CartDrawer() {
                     >
                       {item.name}
                     </Link>
-                    <p className="mt-1 text-sm font-semibold text-ink">
+                    <p className="mt-1 text-sm font-extrabold text-ink">
                       {(item.price * item.quantity).toLocaleString()}원
                     </p>
                     <div className="mt-auto flex items-center justify-between pt-3">
-                      <div className="inline-flex items-center rounded-full border border-ink/15">
+                      <div className="inline-flex items-center rounded-full border border-ink/12 bg-white">
                         <button
                           onClick={() =>
                             setQuantity(item.product_id, item.quantity - 1)
                           }
-                          className="px-3 py-1 text-sm text-ink/70 hover:text-ink"
+                          className="h-8 w-8 text-base text-ink/60 transition hover:text-ink"
                           aria-label="수량 줄이기"
                         >
                           −
@@ -99,7 +147,7 @@ export default function CartDrawer() {
                           onClick={() =>
                             setQuantity(item.product_id, item.quantity + 1)
                           }
-                          className="px-3 py-1 text-sm text-ink/70 hover:text-ink"
+                          className="h-8 w-8 text-base text-ink/60 transition hover:text-ink"
                           aria-label="수량 늘리기"
                         >
                           +
@@ -120,15 +168,17 @@ export default function CartDrawer() {
         </div>
 
         {hydrated && items.length > 0 && (
-          <footer className="border-t border-black/10 bg-cream px-6 py-5">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-ink/70">상품 합계</span>
-              <span className="text-xl font-extrabold tracking-tightest text-ink">
+          <footer className="border-t border-black/8 bg-cream px-6 py-5">
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-ink/65">상품 합계</span>
+              <span className="font-display text-2xl font-extrabold tracking-tightest text-ink">
                 {subtotal.toLocaleString()}원
               </span>
             </div>
             <p className="mt-1 text-xs text-ink/50">
-              배송비는 결제 단계에서 안내됩니다.
+              {subtotal >= 50000
+                ? "✓ 무료배송 적용"
+                : `${(50000 - subtotal).toLocaleString()}원 추가 시 무료배송`}
             </p>
             <Link
               href="/checkout"

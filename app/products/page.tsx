@@ -28,29 +28,28 @@ export default async function ProductsPage() {
   const products = await getProducts();
 
   return (
-    <section className="relative overflow-hidden bg-white pb-24 pt-32 md:pb-32 md:pt-40 lg:pb-40 lg:pt-48">
-      <div className="pointer-events-none absolute -left-10 top-20 select-none text-[180px] font-extrabold leading-none tracking-tightest text-ink/[0.04] md:text-[280px] lg:text-[360px]">
+    <section className="relative overflow-hidden bg-white pb-24 pt-28 md:pb-32 md:pt-36 lg:pb-40 lg:pt-44">
+      <div className="pointer-events-none absolute -left-10 top-20 select-none text-[180px] font-extrabold leading-none tracking-tightest text-ink/[0.035] md:text-[280px] lg:text-[360px]">
         SHOP
       </div>
 
       <div className="container-x relative">
+        {/* Hero header */}
         <div className="reveal flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
           <div className="max-w-3xl">
-            <p className="mb-6 inline-flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] text-brand">
-              <span className="block h-px w-8 bg-brand" />
-              UNNI USTICK · SHOP
-            </p>
-            <h1 className="heading-kr text-4xl text-ink md:text-5xl lg:text-[56px]">
+            <p className="eyebrow mb-7 text-brand">UNNI USTICK · SHOP</p>
+            <h1 className="heading-kr text-4xl text-ink md:text-5xl lg:text-[60px]">
               우리 아이의 크기와 취향에 꼭 맞는,
               <br />
               <span className="text-brand">시그니처 우스틱.</span>
             </h1>
           </div>
 
-          <div className="flex flex-col items-start gap-2 lg:items-end">
-            <p className="text-[11px] font-semibold tracking-[0.3em] text-ink/60">
-              100% 한우 · 국내 최초 특허 기술
-            </p>
+          <div className="flex flex-col items-start gap-3 lg:items-end">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="chip-dark">100% 한우</span>
+              <span className="chip">국내 최초 특허 기술</span>
+            </div>
             <p className="max-w-xs text-sm leading-relaxed text-ink/60 lg:text-right">
               사람이 먹을 수 있는 식재료로만 만드는,
               <br />
@@ -60,7 +59,7 @@ export default async function ProductsPage() {
         </div>
 
         {/* Brand banner */}
-        <div className="reveal mt-14 overflow-hidden bg-[#f5f1eb]">
+        <div className="reveal mt-14 overflow-hidden rounded-2xl bg-[#f5f1eb] shadow-soft">
           <img
             src="/images/unni-ustick-banner.jpg"
             alt="언니우스틱 — 100% 국내산 한우와 국내 최초 특허 기술로 완성한 프리미엄 수제개껌"
@@ -68,9 +67,25 @@ export default async function ProductsPage() {
           />
         </div>
 
+        {/* Filter strip — counter */}
+        <div className="mt-16 flex items-end justify-between border-b border-ink/10 pb-5">
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.3em] text-ink/50">
+              ALL ITEMS
+            </p>
+            <p className="mt-2 text-2xl font-extrabold tracking-tightest text-ink md:text-3xl">
+              총{" "}
+              <span className="text-brand">{products.length}</span>개의 상품
+            </p>
+          </div>
+          <p className="hidden text-xs text-ink/50 md:block">
+            5만원 이상 구매 시 무료배송
+          </p>
+        </div>
+
         {/* Shop grid */}
         {products.length === 0 ? (
-          <div className="mt-16 rounded-2xl bg-cream p-16 text-center">
+          <div className="mt-12 rounded-2xl bg-cream p-16 text-center shadow-soft">
             <p className="text-base font-semibold text-ink">
               등록된 상품이 없습니다.
             </p>
@@ -79,26 +94,30 @@ export default async function ProductsPage() {
             </p>
           </div>
         ) : (
-          <div className="reveal mt-16 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="reveal mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((p) => (
               <article key={p.id} className="group">
                 <Link
                   href={`/products/${p.slug}`}
-                  className="block overflow-hidden rounded-xl bg-cream"
+                  className="block overflow-hidden rounded-2xl bg-cream lift"
                 >
                   <div className="relative aspect-square overflow-hidden">
                     {p.images[0] && (
                       <img
                         src={p.images[0]}
                         alt={p.name}
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
                       />
                     )}
-                    {p.stock <= 0 && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-ink/60 text-sm font-semibold tracking-[0.2em] text-white">
+                    {p.stock <= 0 ? (
+                      <div className="absolute inset-0 flex items-center justify-center bg-ink/65 text-sm font-semibold tracking-[0.25em] text-white">
                         SOLD OUT
                       </div>
-                    )}
+                    ) : p.stock <= 10 ? (
+                      <span className="absolute left-3 top-3 rounded-full bg-accent-warm/95 px-2.5 py-1 text-[10px] font-bold tracking-[0.15em] text-white shadow-sm">
+                        재고 임박
+                      </span>
+                    ) : null}
                   </div>
                 </Link>
 
@@ -111,23 +130,21 @@ export default async function ProductsPage() {
                       {p.name}
                     </Link>
                     {p.en && (
-                      <p className="mt-1 text-[11px] font-semibold tracking-[0.2em] text-ink/50">
+                      <p className="mt-1 text-[11px] font-semibold tracking-[0.2em] text-ink/45">
                         {p.en}
                       </p>
                     )}
                   </div>
                   <p className="shrink-0 text-base font-extrabold tracking-tightest text-ink md:text-lg">
-                    {p.price.toLocaleString()}원
+                    {p.price.toLocaleString()}
+                    <span className="ml-0.5 text-xs font-semibold text-ink/60">원</span>
                   </p>
                 </div>
 
                 {p.tags.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {p.tags.slice(0, 3).map((t) => (
-                      <span
-                        key={t}
-                        className="rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-semibold text-brand-800"
-                      >
+                      <span key={t} className="chip">
                         {t}
                       </span>
                     ))}

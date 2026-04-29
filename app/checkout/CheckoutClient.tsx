@@ -290,8 +290,7 @@ export default function CheckoutClient() {
   );
 }
 
-const inputCls =
-  "w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-sm text-ink outline-none transition focus:border-ink focus:ring-2 focus:ring-ink/10";
+const inputCls = "field-input";
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (

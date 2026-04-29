@@ -54,21 +54,25 @@ export default async function ProductDetailPage({
   const related = await getRelated(params.slug);
 
   return (
-    <section className="relative bg-white pb-24 pt-32 md:pb-32 md:pt-40">
+    <section className="relative bg-white pb-24 pt-28 md:pb-32 md:pt-36">
       <div className="container-x">
         {/* Breadcrumb */}
-        <nav className="mb-8 flex items-center gap-2 text-xs font-semibold tracking-[0.2em] text-ink/50">
+        <nav className="mb-10 flex items-center gap-2 text-xs font-semibold tracking-[0.2em] text-ink/50">
+          <Link href="/" className="transition hover:text-ink">
+            HOME
+          </Link>
+          <span>·</span>
           <Link href="/products" className="transition hover:text-ink">
             SHOP
           </Link>
-          <span>/</span>
+          <span>·</span>
           <span className="text-ink">{product.en || product.name}</span>
         </nav>
 
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
           {/* Image gallery */}
           <div className="space-y-3">
-            <div className="aspect-square overflow-hidden rounded-2xl bg-cream">
+            <div className="aspect-square overflow-hidden rounded-3xl bg-cream shadow-soft">
               {product.images[0] && (
                 <img
                   src={product.images[0]}
@@ -82,7 +86,7 @@ export default async function ProductDetailPage({
                 {product.images.slice(1, 5).map((img, i) => (
                   <div
                     key={i}
-                    className="aspect-square overflow-hidden rounded-xl bg-cream"
+                    className="aspect-square overflow-hidden rounded-xl bg-cream ring-1 ring-black/5"
                   >
                     <img src={img} alt="" className="h-full w-full object-cover" />
                   </div>
@@ -98,25 +102,24 @@ export default async function ProductDetailPage({
                 {product.en}
               </p>
             )}
-            <h1 className="mt-3 text-3xl font-extrabold leading-tight text-ink md:text-4xl">
+            <h1 className="mt-3 text-[28px] font-extrabold leading-[1.18] text-ink md:text-[36px]">
               {product.name}
             </h1>
             {product.spec && (
               <p className="mt-3 text-sm text-ink/60">{product.spec}</p>
             )}
 
-            <p className="mt-8 font-display text-4xl font-extrabold tracking-tightest text-ink md:text-5xl">
-              {product.price.toLocaleString()}
-              <span className="ml-1 text-2xl font-semibold">원</span>
-            </p>
+            <div className="mt-8 flex items-baseline gap-3">
+              <p className="font-display text-4xl font-extrabold tracking-tightest text-ink md:text-5xl">
+                {product.price.toLocaleString()}
+              </p>
+              <span className="text-2xl font-semibold text-ink/70">원</span>
+            </div>
 
             {product.tags.length > 0 && (
               <div className="mt-6 flex flex-wrap gap-2">
                 {product.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="rounded-full bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-800"
-                  >
+                  <span key={t} className="chip">
                     {t}
                   </span>
                 ))}
@@ -151,7 +154,7 @@ export default async function ProductDetailPage({
             </div>
 
             {/* Spec details */}
-            <dl className="mt-10 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-black/10 pt-8 text-sm">
+            <dl className="mt-12 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-black/10 pt-10 text-sm">
               <Spec label="제조국" value="대한민국 (부산)" />
               <Spec label="원료" value="100% 국내산 한우" />
               <Spec label="조단백" value="65% 이상" />
@@ -166,9 +169,12 @@ export default async function ProductDetailPage({
         {related.length > 0 && (
           <div className="mt-24 border-t border-black/10 pt-16 md:mt-32 md:pt-24">
             <div className="flex items-end justify-between">
-              <h2 className="text-2xl font-extrabold tracking-tightest text-ink md:text-3xl">
-                이런 상품은 어떠세요?
-              </h2>
+              <div>
+                <p className="eyebrow text-brand">RELATED PRODUCTS</p>
+                <h2 className="mt-3 text-2xl font-extrabold tracking-tightest text-ink md:text-3xl">
+                  이런 상품은 어떠세요?
+                </h2>
+              </div>
               <Link
                 href="/products"
                 className="text-xs font-semibold tracking-[0.2em] text-ink/60 transition hover:text-ink"
@@ -176,19 +182,19 @@ export default async function ProductDetailPage({
                 전체 상품 →
               </Link>
             </div>
-            <div className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
               {related.map((p) => (
                 <Link
                   key={p.id}
                   href={`/products/${p.slug}`}
                   className="group block"
                 >
-                  <div className="aspect-square overflow-hidden rounded-xl bg-cream">
+                  <div className="aspect-square overflow-hidden rounded-2xl bg-cream lift">
                     {p.images[0] && (
                       <img
                         src={p.images[0]}
                         alt={p.name}
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
                       />
                     )}
                   </div>
@@ -214,7 +220,7 @@ function Spec({ label, value }: { label: string; value: string }) {
       <dt className="text-[11px] font-semibold tracking-[0.2em] text-ink/50">
         {label}
       </dt>
-      <dd className="mt-1 text-sm font-semibold text-ink">{value}</dd>
+      <dd className="mt-1.5 text-sm font-semibold text-ink">{value}</dd>
     </div>
   );
 }
