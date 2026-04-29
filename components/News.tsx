@@ -1,8 +1,34 @@
 const CERTS = [
-  { src: "/images/cert-1.jpg", label: "특허증", en: "Patent" },
-  { src: "/images/cert-2.jpg", label: "사업자 등록증", en: "Business License" },
-  { src: "/images/cert-3.jpg", label: "사료 제조 등록증", en: "Manufacturer Cert." },
-  { src: "/images/cert-4.jpg", label: "영업 신고증", en: "Operation License" },
+  {
+    src: "/images/patent-1-drying.jpg",
+    label: "특허증 · 간식 건조장치",
+    en: "Patent No. 10-2379135",
+    detail: "애완동물 간식용 건조장치 및 이를 이용한 간식 제조방법",
+  },
+  {
+    src: "/images/patent-2-rack.jpg",
+    label: "특허증 · 간식 건조대",
+    en: "Patent No. 10-2729562",
+    detail: "애완동물 간식 건조대",
+  },
+  {
+    src: "/images/trademark-class35.jpg",
+    label: "상표등록증 · 제35류",
+    en: "Trademark No. 40-2120315",
+    detail: "반려동물용 수제간식 도매업 등 10건",
+  },
+  {
+    src: "/images/trademark-class31.jpg",
+    label: "상표등록증 · 제31류",
+    en: "Trademark No. 40-2120314",
+    detail: "반려동물용 수제간식 19건",
+  },
+  {
+    src: "/images/feed-mfg-cert.jpg",
+    label: "사료제조업 등록증",
+    en: "Feed Manufacturer Reg.",
+    detail: "단미사료 제조업 · 부산광역시장 6260000-502-2021-0027",
+  },
 ];
 
 export default function News() {
@@ -99,19 +125,23 @@ export default function News() {
                 CERTIFICATIONS
               </p>
               <h3 className="mt-3 text-3xl font-extrabold leading-tight text-ink md:text-4xl">
-                인증서 · 사업자 등록증
+                특허 · 상표 · 제조업 등록증
               </h3>
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink/60">
+                국내 최초 특허받은 제조 기술과 등록된 상표권. 펫브로는 정식 사료
+                제조업 등록을 통해 검증된 시설에서 간식을 만듭니다.
+              </p>
             </div>
             <span className="hidden text-xs text-ink/40 md:block">
-              제 10-2379135 호 외
+              특허 2건 · 상표 2건 · 제조업 등록
             </span>
           </div>
 
-          <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5 md:gap-6">
             {CERTS.map((c, i) => (
               <div
                 key={c.label}
-                className={`reveal reveal-delay-${i + 1} group cursor-pointer`}
+                className={`reveal reveal-delay-${(i % 4) + 1} group cursor-pointer`}
               >
                 <div className="relative aspect-[3/4] overflow-hidden bg-white shadow-lg ring-1 ring-black/5 transition-transform duration-500 group-hover:-translate-y-1 group-hover:shadow-xl">
                   <img
@@ -124,6 +154,9 @@ export default function News() {
                   {c.en}
                 </p>
                 <p className="mt-1 text-sm font-bold text-ink">{c.label}</p>
+                <p className="mt-1 text-xs leading-relaxed text-ink/60">
+                  {c.detail}
+                </p>
               </div>
             ))}
           </div>

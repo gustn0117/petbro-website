@@ -6,10 +6,17 @@ export default function Footer() {
       <div className="container-x">
         <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="font-display text-3xl font-extrabold tracking-tightest text-white md:text-4xl">
-              PAT BRO
-            </p>
-            <p className="mt-2 text-xs font-semibold tracking-[0.3em] text-white/50">
+            <div className="flex items-center gap-4">
+              <img
+                src="/images/patbro-mark-white.png"
+                alt=""
+                className="h-12 w-12 md:h-14 md:w-14"
+              />
+              <p className="font-display text-3xl font-extrabold tracking-tightest text-white md:text-4xl">
+                PAT BRO
+              </p>
+            </div>
+            <p className="mt-4 text-xs font-semibold tracking-[0.3em] text-white/50">
               위생을 최우선시 하는 애견간식 제조업체
             </p>
             <p className="mt-6 text-sm leading-relaxed text-white/50">

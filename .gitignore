@@ -4,3 +4,9 @@ out/
 .env*
 .DS_Store
 *.log
+
+# Source assets (originals are processed into public/images)
+/등록:특허/
+/언니우스틱/
+*.ai
+*.pdf

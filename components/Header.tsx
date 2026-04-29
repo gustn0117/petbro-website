@@ -45,15 +45,23 @@ export default function Header() {
       <div className="container-x flex h-[72px] items-center justify-between md:h-[84px]">
         <Link
           href="/"
-          className={`flex items-baseline gap-2 transition-colors ${
+          aria-label="PAT BRO 펫브로 홈"
+          className={`flex items-center gap-3 transition-colors ${
             solid ? "text-ink" : "text-white"
           }`}
         >
-          <span className="font-display text-2xl font-extrabold tracking-tightest md:text-[28px]">
-            PAT BRO
-          </span>
-          <span className="hidden text-xs font-medium tracking-[0.2em] opacity-70 md:inline">
-            PETBRO
+          <img
+            src={solid ? "/images/patbro-mark.png" : "/images/patbro-mark-white.png"}
+            alt=""
+            className="h-9 w-9 md:h-10 md:w-10"
+          />
+          <span className="flex items-baseline gap-2">
+            <span className="font-display text-2xl font-extrabold tracking-tightest md:text-[26px]">
+              PAT BRO
+            </span>
+            <span className="hidden text-[10px] font-semibold tracking-[0.3em] opacity-60 md:inline">
+              펫브로
+            </span>
           </span>
         </Link>
 

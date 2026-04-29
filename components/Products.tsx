@@ -112,8 +112,58 @@ export default function Products() {
           </div>
         </div>
 
-        {/* Banner with dogs hero */}
-        <div className="reveal mt-14 grid items-center gap-px overflow-hidden bg-ink/10 md:grid-cols-2">
+        {/* Brand banner */}
+        <div className="reveal mt-14 overflow-hidden bg-[#f5f1eb]">
+          <img
+            src="/images/unni-ustick-banner.jpg"
+            alt="언니우스틱 — 100% 국내산 한우와 국내 최초 특허 기술로 완성한 프리미엄 수제개껌"
+            className="block w-full"
+          />
+        </div>
+
+        {/* Wordmark + Romance feature */}
+        <div className="reveal mt-12 grid gap-px overflow-hidden bg-ink/10 md:grid-cols-12">
+          <div className="bg-white p-8 md:col-span-5 md:p-12 lg:p-14">
+            <p className="text-[11px] font-semibold tracking-[0.3em] text-brand">
+              BRANDMARK · UNNI USTICK
+            </p>
+            <div className="mt-6 flex items-center justify-center bg-cream p-6 md:p-8">
+              <img
+                src="/images/unni-ustick-wordmark.jpg"
+                alt="언니우스틱 워드마크"
+                className="h-auto w-full max-w-xs object-contain"
+              />
+            </div>
+            <h3 className="mt-8 text-2xl font-extrabold leading-tight text-ink md:text-[26px]">
+              개껌이라면 역시,
+              <span className="text-brand"> 언니우스틱.</span>
+            </h3>
+            <p className="mt-4 text-[15px] leading-relaxed text-ink/70">
+              펫브로가 만들고 언니도그가 유통하는 시그니처 라인. 국내 최초 특허
+              기술로 완성한 100% 국내산 한우 프리미엄 수제 개껌입니다.
+            </p>
+          </div>
+
+          <div className="relative aspect-[3/4] overflow-hidden bg-ink md:col-span-7 md:aspect-auto">
+            <img
+              src="/images/unni-ustick-romance.jpg"
+              alt="낭만을 씹는다 — 언니우스틱"
+              className="absolute inset-0 h-full w-full object-cover object-top"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent" />
+            <div className="absolute bottom-6 left-6 text-white md:bottom-8 md:left-8">
+              <p className="text-[11px] font-semibold tracking-[0.3em] text-brand-200">
+                EDITORIAL · 2025
+              </p>
+              <p className="mt-2 font-display text-2xl font-extrabold tracking-tightest md:text-3xl">
+                난 오늘 낭만을 씹는다.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* SPEC card */}
+        <div className="reveal mt-px grid items-center gap-px overflow-hidden bg-ink/10 md:grid-cols-2">
           <div className="relative aspect-[16/9] bg-cream md:aspect-auto md:h-full">
             <img
               src="/images/dogs-hero.jpg"
@@ -188,6 +238,34 @@ export default function Products() {
               <span className="mt-6 block h-px w-8 bg-ink/20 transition-all duration-500 group-hover:w-16 group-hover:bg-brand" />
             </article>
           ))}
+        </div>
+
+        {/* Video clip */}
+        <div className="reveal mt-16 grid gap-px overflow-hidden bg-ink/10 md:grid-cols-12">
+          <div className="relative bg-ink md:col-span-8">
+            <video
+              src="/images/unni-ustick.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="block aspect-video w-full object-cover"
+            />
+          </div>
+          <div className="bg-cream p-8 md:col-span-4 md:p-10">
+            <p className="text-[11px] font-semibold tracking-[0.3em] text-brand">
+              IN ACTION
+            </p>
+            <h3 className="mt-4 text-xl font-extrabold leading-tight text-ink md:text-2xl">
+              씹는 재미가 다른
+              <br />
+              언니우스틱.
+            </h3>
+            <p className="mt-4 text-[14px] leading-relaxed text-ink/70">
+              한우 100%로 만들어 자연스러운 향과 식감. 우리 아이가 오래오래
+              집중해서 씹을 수 있는, 펫브로의 시그니처 우스틱입니다.
+            </p>
+          </div>
         </div>
 
         {/* CTA */}
