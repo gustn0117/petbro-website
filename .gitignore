@@ -2,8 +2,10 @@ node_modules/
 .next/
 out/
 .env*
+!.env.production
 .DS_Store
 *.log
+tsconfig.tsbuildinfo
 
 # Source assets (originals are processed into public/images)
 /등록:특허/
