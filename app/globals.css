@@ -48,16 +48,20 @@ body {
   .container-x {
     @apply mx-auto w-full max-w-[1440px] px-6 md:px-10 lg:px-16;
   }
+  /*
+   * Tailwind 의 text-Nxl 유틸리티는 line-height 가 묶여서 출력되므로
+   * 디자인 의도를 보장하려면 !important 로 덮어써야 함.
+   */
   .heading-display {
     font-family: "Montserrat", "Pretendard", sans-serif;
     font-weight: 800;
     letter-spacing: -0.04em;
-    line-height: 0.95;
+    line-height: 0.95 !important;
   }
   .heading-kr {
     font-weight: 800;
     letter-spacing: -0.03em;
-    line-height: 1.15;
+    line-height: 1.15 !important;
   }
   .text-balance {
     text-wrap: balance;
