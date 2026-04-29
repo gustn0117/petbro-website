@@ -67,6 +67,33 @@ export default async function ProductsPage() {
           />
         </div>
 
+        {/* Video showcase */}
+        <div className="reveal mt-8 grid gap-px overflow-hidden rounded-2xl bg-ink/10 shadow-soft md:grid-cols-12">
+          <div className="relative bg-ink md:col-span-8">
+            <video
+              src="/images/unni-ustick.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster="/images/unni-ustick-romance.jpg"
+              className="block aspect-video w-full object-cover"
+            />
+          </div>
+          <div className="flex flex-col justify-center bg-cream p-7 md:col-span-4 md:p-10">
+            <p className="eyebrow text-brand">IN ACTION</p>
+            <h3 className="mt-4 text-xl font-extrabold leading-[1.25] text-ink md:text-2xl">
+              씹는 재미가 다른
+              <br />
+              <span className="text-brand">언니우스틱.</span>
+            </h3>
+            <p className="mt-4 text-[14.5px] leading-relaxed text-ink/65">
+              한우 100%로 만들어 자연스러운 향과 식감.
+              우리 아이가 오래오래 집중해서 씹을 수 있는, 펫브로의 시그니처 우스틱입니다.
+            </p>
+          </div>
+        </div>
+
         {/* Filter strip — counter */}
         <div className="mt-16 flex items-end justify-between border-b border-ink/10 pb-5">
           <div>

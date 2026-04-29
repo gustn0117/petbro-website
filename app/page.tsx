@@ -46,9 +46,9 @@ const SECTIONS = [
 
 const STATS = [
   { value: "2021", label: "공장 설립" },
-  { value: "2", label: "등록 특허" },
   { value: "100%", label: "국내산 한우" },
-  { value: "30%↑", label: "에너지 절감" },
+  { value: "2건", label: "특허등록", sub: "30% 에너지 절감" },
+  { value: "70%↑", label: "재구매율" },
 ];
 
 export default function HomePage() {
@@ -62,14 +62,19 @@ export default function HomePage() {
           {STATS.map((s, i) => (
             <div
               key={s.label}
-              className={`py-8 md:py-10 ${i > 0 ? "md:border-l md:border-black/5" : ""} ${i === 1 ? "border-l border-black/5" : ""} ${i >= 2 ? "border-t border-black/5 md:border-t-0" : ""}`}
+              className={`flex flex-col items-center justify-center py-8 md:py-10 ${i > 0 ? "md:border-l md:border-black/5" : ""} ${i === 1 ? "border-l border-black/5" : ""} ${i >= 2 ? "border-t border-black/5 md:border-t-0" : ""}`}
             >
-              <p className="text-center font-display text-3xl font-extrabold tracking-tightest text-ink md:text-4xl">
+              <p className="font-display text-3xl font-extrabold tracking-tightest text-ink md:text-4xl">
                 {s.value}
               </p>
-              <p className="mt-2 text-center text-[11px] font-semibold tracking-[0.25em] text-ink/55">
+              <p className="mt-2 text-[11px] font-semibold tracking-[0.25em] text-ink/55">
                 {s.label}
               </p>
+              {s.sub && (
+                <p className="mt-1 text-[10px] font-semibold tracking-[0.18em] text-brand">
+                  {s.sub}
+                </p>
+              )}
             </div>
           ))}
         </div>

@@ -72,10 +72,11 @@ export default function About() {
               </p>
             </div>
 
-            <div className="mt-10 grid grid-cols-3 gap-4 border-t border-ink/10 pt-8">
+            <div className="mt-10 grid grid-cols-2 gap-4 border-t border-ink/10 pt-8 md:grid-cols-4">
               <Stat number="2021" label="공장 설립" />
               <Stat number="100%" label="국내산 한우" />
-              <Stat number="30%↑" label="에너지 절감" />
+              <Stat number="2건" label="특허등록" />
+              <Stat number="70%↑" label="재구매율" />
             </div>
           </div>
 
@@ -107,6 +108,85 @@ export default function About() {
               <p className="mt-4 text-xs text-white/60">
                 연합뉴스 / 부산경제진흥원
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Location & Map */}
+        <div className="reveal mt-24 grid gap-8 md:mt-32 md:grid-cols-12 md:gap-10">
+          <div className="md:col-span-4 lg:col-span-4">
+            <p className="eyebrow mb-6 text-brand">LOCATION</p>
+            <h2 className="heading-kr text-3xl text-ink md:text-4xl lg:text-[44px]">
+              부산 사상구
+              <br />
+              <span className="text-brand">펫브로 본사.</span>
+            </h2>
+            <p className="mt-6 text-[15px] leading-relaxed text-ink/70">
+              사람과 반려견이 함께 쉬어가는 카페 공간을 운영합니다.
+              방문 전 전화로 문의 부탁드립니다.
+            </p>
+            <dl className="mt-8 space-y-4 border-t border-ink/10 pt-6">
+              <div>
+                <dt className="text-[11px] font-semibold tracking-[0.3em] text-ink/55">
+                  ADDRESS
+                </dt>
+                <dd className="mt-1.5 text-sm font-semibold text-ink">
+                  부산광역시 사상구 괘감로 98-1
+                </dd>
+              </div>
+              <div>
+                <dt className="text-[11px] font-semibold tracking-[0.3em] text-ink/55">
+                  TEL
+                </dt>
+                <dd className="mt-1.5">
+                  <a
+                    href="tel:010-2466-2313"
+                    className="text-sm font-semibold text-ink transition hover:text-brand"
+                  >
+                    010-2466-2313
+                  </a>
+                </dd>
+              </div>
+              <div>
+                <dt className="text-[11px] font-semibold tracking-[0.3em] text-ink/55">
+                  HOURS
+                </dt>
+                <dd className="mt-1.5 text-sm text-ink/80">
+                  평일 09:00 — 18:00
+                  <br />
+                  주말 / 공휴일 휴무
+                </dd>
+              </div>
+            </dl>
+            <div className="mt-8 flex flex-wrap gap-2">
+              <a
+                href="https://map.kakao.com/?q=부산광역시+사상구+괘감로+98-1"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-ink/15 px-4 py-2 text-xs font-semibold text-ink transition hover:border-ink hover:bg-ink hover:text-white"
+              >
+                카카오맵 →
+              </a>
+              <a
+                href="https://map.naver.com/p/search/부산%20사상구%20괘감로%2098-1"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-ink/15 px-4 py-2 text-xs font-semibold text-ink transition hover:border-ink hover:bg-ink hover:text-white"
+              >
+                네이버지도 →
+              </a>
+            </div>
+          </div>
+          <div className="md:col-span-8 lg:col-span-8">
+            <div className="overflow-hidden rounded-2xl bg-cream shadow-soft">
+              <iframe
+                src="https://maps.google.com/maps?q=%EB%B6%80%EC%82%B0%EA%B4%91%EC%97%AD%EC%8B%9C%20%EC%82%AC%EC%83%81%EA%B5%AC%20%EA%B4%98%EA%B0%90%EB%A1%9C%2098-1&z=17&output=embed&hl=ko"
+                title="펫브로 본사 위치 — 부산광역시 사상구 괘감로 98-1"
+                className="block h-[360px] w-full md:h-[460px] lg:h-[520px]"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
           </div>
         </div>

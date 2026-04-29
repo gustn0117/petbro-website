@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCart } from "./cart/CartProvider";
+import WholesaleModal from "./WholesaleModal";
 
 const NAV = [
   { href: "/about", label: "ABOUT", kr: "회사소개" },
@@ -18,6 +19,7 @@ export default function Header() {
   const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [wholesaleOpen, setWholesaleOpen] = useState(false);
   const { totalQuantity, open: openCart, hydrated } = useCart();
 
   useEffect(() => {
@@ -95,8 +97,9 @@ export default function Header() {
 
         {/* Right side: tel + cart + hamburger */}
         <div className="flex items-center gap-3">
-          <a
-            href="tel:010-2466-2313"
+          <button
+            type="button"
+            onClick={() => setWholesaleOpen(true)}
             className={`hidden rounded-full border px-5 py-2.5 text-xs font-semibold tracking-[0.14em] transition-all lg:inline-flex ${
               solid
                 ? "border-ink text-ink hover:bg-ink hover:text-white"
@@ -104,7 +107,7 @@ export default function Header() {
             }`}
           >
             도매문의 010-2466-2313
-          </a>
+          </button>
 
           <button
             onClick={openCart}
@@ -189,15 +192,23 @@ export default function Header() {
               <span className="text-sm text-ink/60">{item.kr}</span>
             </Link>
           ))}
-          <a
-            href="tel:010-2466-2313"
-            onClick={() => setOpen(false)}
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              setWholesaleOpen(true);
+            }}
             className="mt-10 inline-flex items-center justify-center rounded-full bg-ink px-6 py-4 text-sm font-semibold tracking-[0.14em] text-white"
           >
             도매문의 010-2466-2313
-          </a>
+          </button>
         </nav>
       </div>
+
+      <WholesaleModal
+        open={wholesaleOpen}
+        onClose={() => setWholesaleOpen(false)}
+      />
     </header>
   );
 }

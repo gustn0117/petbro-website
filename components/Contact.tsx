@@ -39,8 +39,8 @@ export default function Contact() {
               />
               <ContactRow
                 label="NAVER"
-                value="언니도그 펫 슈퍼"
-                href="https://search.naver.com/search.naver?query=언니도그+펫+슈퍼"
+                value="언니도그 펫 슈퍼 스마트스토어"
+                href="https://smartstore.naver.com/unnidog-petsuper"
               />
             </div>
           </div>
