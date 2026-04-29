@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="border-t border-white/10 bg-ink-900 py-12 text-white/60">
@@ -18,11 +20,11 @@ export default function Footer() {
           </div>
 
           <div className="grid grid-cols-2 gap-x-10 gap-y-2 text-sm md:grid-cols-3">
-            <FooterLink href="#about" label="회사소개" />
-            <FooterLink href="#process" label="제조공정" />
-            <FooterLink href="#products" label="제품" />
-            <FooterLink href="#news" label="언론보도" />
-            <FooterLink href="#contact" label="문의" />
+            <FooterLink href="/about" label="회사소개" />
+            <FooterLink href="/process" label="제조공정" />
+            <FooterLink href="/products" label="제품" />
+            <FooterLink href="/news" label="언론보도" />
+            <FooterLink href="/contact" label="문의" />
             <FooterLink
               href="https://www.instagram.com/unni_dog_2017"
               label="인스타그램"
@@ -49,14 +51,24 @@ function FooterLink({
   label: string;
   ext?: boolean;
 }) {
+  if (ext) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className="py-1 text-white/60 transition-colors hover:text-brand-200"
+      >
+        {label}
+      </a>
+    );
+  }
   return (
-    <a
+    <Link
       href={href}
-      target={ext ? "_blank" : undefined}
-      rel={ext ? "noreferrer" : undefined}
       className="py-1 text-white/60 transition-colors hover:text-brand-200"
     >
       {label}
-    </a>
+    </Link>
   );
 }

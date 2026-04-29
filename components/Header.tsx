@@ -1,16 +1,20 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const NAV = [
-  { href: "#about", label: "ABOUT", kr: "회사소개" },
-  { href: "#process", label: "PROCESS", kr: "제조공정" },
-  { href: "#products", label: "PRODUCTS", kr: "제품" },
-  { href: "#news", label: "NEWS", kr: "언론보도" },
-  { href: "#contact", label: "CONTACT", kr: "문의" },
+  { href: "/about", label: "ABOUT", kr: "회사소개" },
+  { href: "/process", label: "PROCESS", kr: "제조공정" },
+  { href: "/products", label: "PRODUCTS", kr: "제품" },
+  { href: "/news", label: "NEWS", kr: "언론보도" },
+  { href: "/contact", label: "CONTACT", kr: "문의" },
 ];
 
 export default function Header() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -28,19 +32,21 @@ export default function Header() {
     };
   }, [open]);
 
+  const solid = !isHome || scrolled;
+
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled
+        solid
           ? "bg-white/85 backdrop-blur-md border-b border-black/5"
           : "bg-transparent"
       }`}
     >
       <div className="container-x flex h-[72px] items-center justify-between md:h-[84px]">
-        <a
-          href="#top"
+        <Link
+          href="/"
           className={`flex items-baseline gap-2 transition-colors ${
-            scrolled ? "text-ink" : "text-white"
+            solid ? "text-ink" : "text-white"
           }`}
         >
           <span className="font-display text-2xl font-extrabold tracking-tightest md:text-[28px]">
@@ -49,32 +55,37 @@ export default function Header() {
           <span className="hidden text-xs font-medium tracking-[0.2em] opacity-70 md:inline">
             PETBRO
           </span>
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-9 lg:flex">
-          {NAV.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className={`group relative text-[13px] font-semibold tracking-[0.18em] transition-colors ${
-                scrolled ? "text-ink hover:text-brand" : "text-white/90 hover:text-white"
-              }`}
-            >
-              {item.label}
-              <span
-                className={`absolute -bottom-1 left-0 block h-px w-0 transition-all duration-300 group-hover:w-full ${
-                  scrolled ? "bg-brand" : "bg-white"
+          {NAV.map((item) => {
+            const active = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`group relative text-[13px] font-semibold tracking-[0.18em] transition-colors ${
+                  solid
+                    ? `${active ? "text-brand" : "text-ink"} hover:text-brand`
+                    : `${active ? "text-white" : "text-white/90"} hover:text-white`
                 }`}
-              />
-            </a>
-          ))}
+              >
+                {item.label}
+                <span
+                  className={`absolute -bottom-1 left-0 block h-px transition-all duration-300 ${
+                    active ? "w-full" : "w-0 group-hover:w-full"
+                  } ${solid ? "bg-brand" : "bg-white"}`}
+                />
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
           <a
             href="tel:010-2466-2313"
             className={`rounded-full border px-5 py-2.5 text-xs font-semibold tracking-[0.14em] transition-all ${
-              scrolled
+              solid
                 ? "border-ink text-ink hover:bg-ink hover:text-white"
                 : "border-white/60 text-white hover:bg-white hover:text-ink"
             }`}
@@ -86,7 +97,7 @@ export default function Header() {
         <button
           onClick={() => setOpen((v) => !v)}
           className={`relative h-10 w-10 lg:hidden ${
-            scrolled || open ? "text-ink" : "text-white"
+            solid || open ? "text-ink" : "text-white"
           }`}
           aria-label="메뉴 열기"
         >
@@ -116,7 +127,7 @@ export default function Header() {
       >
         <nav className="flex flex-col gap-1 px-6 pt-10">
           {NAV.map((item, i) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
@@ -132,7 +143,7 @@ export default function Header() {
                 {item.label}
               </span>
               <span className="text-sm text-ink/60">{item.kr}</span>
-            </a>
+            </Link>
           ))}
           <a
             href="tel:010-2466-2313"

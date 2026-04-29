@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Hero() {
   return (
     <section
@@ -56,20 +58,20 @@ export default function Hero() {
           </p>
 
           <div className="mt-12 flex flex-wrap items-center gap-4 animate-fade-up [animation-delay:600ms]">
-            <a
-              href="#products"
+            <Link
+              href="/products"
               className="group inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-sm font-semibold tracking-[0.14em] text-ink transition-all hover:bg-brand hover:text-white"
             >
               제품 보기
               <span className="transition-transform group-hover:translate-x-1">→</span>
-            </a>
-            <a
-              href="#about"
+            </Link>
+            <Link
+              href="/about"
               className="group inline-flex items-center gap-3 rounded-full border border-white/40 px-7 py-4 text-sm font-semibold tracking-[0.14em] text-white transition-all hover:border-white hover:bg-white/10"
             >
               브랜드 스토리
               <span className="transition-transform group-hover:translate-x-1">→</span>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
