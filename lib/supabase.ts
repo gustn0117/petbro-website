@@ -23,6 +23,13 @@ export function supabaseAdmin() {
   });
 }
 
+export type PricingTier = {
+  min_qty: number;
+  /** null = unlimited (top tier) */
+  max_qty: number | null;
+  price: number;
+};
+
 export type Product = {
   id: string;
   slug: string;
@@ -32,6 +39,9 @@ export type Product = {
   description: string | null;
   tags: string[];
   price: number;
+  consumer_price: number | null;
+  pricing_tiers: PricingTier[];
+  min_order_quantity: number;
   stock: number;
   images: string[];
   detail_images: string[];

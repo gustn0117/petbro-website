@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { supabasePublic, type Product } from "@/lib/supabase";
 import AddToCartButton from "@/components/cart/AddToCartButton";
 import { getCurrentUser } from "@/lib/customer-auth";
+import { startingPrice } from "@/lib/pricing";
+import ProductDetailPriceBlock from "./ProductDetailPriceBlock";
 
 export const dynamic = "force-dynamic";
 
@@ -115,12 +117,12 @@ export default async function ProductDetailPage({
             )}
 
             {approved ? (
-              <div className="mt-8 flex items-baseline gap-3">
-                <p className="font-display text-4xl font-extrabold tracking-tightest text-ink md:text-5xl">
-                  {product.price.toLocaleString()}
-                </p>
-                <span className="text-2xl font-semibold text-ink/70">원</span>
-              </div>
+              <ProductDetailPriceBlock
+                consumerPrice={product.consumer_price}
+                basePrice={product.price}
+                pricingTiers={product.pricing_tiers || []}
+                minOrderQuantity={product.min_order_quantity ?? 10}
+              />
             ) : (
               <div className="mt-8">
                 <Link
@@ -162,6 +164,8 @@ export default async function ProductDetailPage({
                   name: product.name,
                   price: product.price,
                   image: product.images[0] || null,
+                  pricing_tiers: product.pricing_tiers || [],
+                  min_order_quantity: product.min_order_quantity ?? 10,
                 }}
                 disabled={product.stock <= 0}
                 showQuantity
@@ -172,7 +176,7 @@ export default async function ProductDetailPage({
 
               <p className="text-center text-xs text-ink/50">
                 {product.stock > 0
-                  ? `재고 ${product.stock}개 · 영업일 기준 1-2일 이내 발송`
+                  ? `재고 ${product.stock}개 · 최소 주문 ${product.min_order_quantity ?? 10}개 · 영업일 기준 1-2일 이내 발송`
                   : "현재 품절된 상품입니다"}
               </p>
             </div>
@@ -249,9 +253,15 @@ export default async function ProductDetailPage({
                     {p.name}
                   </p>
                   {approved ? (
-                    <p className="mt-1 text-sm font-bold text-ink">
-                      {p.price.toLocaleString()}원
-                    </p>
+                    (() => {
+                      const sp = startingPrice(p.pricing_tiers, p.price);
+                      const hasTiers = (p.pricing_tiers?.length ?? 0) > 0;
+                      return (
+                        <p className="mt-1 text-sm font-bold text-ink">
+                          {sp.price.toLocaleString()}원{hasTiers ? "~" : ""}
+                        </p>
+                      );
+                    })()
                   ) : (
                     <p className="mt-1 text-xs font-semibold text-ink/55">
                       로그인 후 확인 →

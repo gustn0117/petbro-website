@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { redirect, notFound } from "next/navigation";
 import { isAdmin } from "@/lib/auth";
 import { supabaseAdmin, type Product } from "@/lib/supabase";
+import { validateTiers } from "@/lib/pricing";
 import ProductForm, { type ProductFormValues } from "@/components/admin/ProductForm";
 
 async function getProduct(id: string): Promise<Product | null> {
@@ -34,6 +35,9 @@ async function updateProduct(values: ProductFormValues) {
     return { ok: false, error: "이미 사용 중인 slug입니다." };
   }
 
+  const tierError = validateTiers(values.pricing_tiers);
+  if (tierError) return { ok: false, error: tierError };
+
   const { error } = await supabaseAdmin()
     .from("products")
     .update({
@@ -44,6 +48,9 @@ async function updateProduct(values: ProductFormValues) {
       description: values.description.trim() || null,
       tags: values.tags,
       price: values.price,
+      consumer_price: values.consumer_price,
+      pricing_tiers: values.pricing_tiers,
+      min_order_quantity: values.min_order_quantity,
       stock: values.stock,
       images: values.images,
       detail_images: values.detail_images,
@@ -78,6 +85,9 @@ export default async function EditProductPage({
     description: product.description || "",
     tags: product.tags || [],
     price: product.price,
+    consumer_price: product.consumer_price ?? null,
+    pricing_tiers: product.pricing_tiers || [],
+    min_order_quantity: product.min_order_quantity ?? 10,
     stock: product.stock,
     images: product.images || [],
     detail_images: product.detail_images || [],

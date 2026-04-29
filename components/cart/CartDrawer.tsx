@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { useCart } from "./CartProvider";
+import { useCart, unitPriceForItem } from "./CartProvider";
+import { nextTier } from "@/lib/pricing";
 
 export default function CartDrawer({ authed }: { authed: boolean }) {
   const { items, isOpen, close, setQuantity, remove, subtotal, hydrated } =
@@ -167,9 +168,25 @@ export default function CartDrawer({ authed }: { authed: boolean }) {
                     >
                       {item.name}
                     </Link>
-                    <p className="mt-1 text-sm font-extrabold text-ink">
-                      {(item.price * item.quantity).toLocaleString()}원
-                    </p>
+                    {(() => {
+                      const unit = unitPriceForItem(item);
+                      const next = nextTier(item.pricing_tiers, item.quantity);
+                      return (
+                        <>
+                          <p className="mt-1 text-sm font-extrabold text-ink">
+                            {(unit * item.quantity).toLocaleString()}원
+                            <span className="ml-1.5 text-[11px] font-medium text-ink/55">
+                              ({unit.toLocaleString()}원 × {item.quantity})
+                            </span>
+                          </p>
+                          {next && (
+                            <p className="mt-1 text-[11px] font-semibold text-brand">
+                              +{next.needed}개 → {next.tier.price.toLocaleString()}원
+                            </p>
+                          )}
+                        </>
+                      );
+                    })()}
                     <div className="mt-auto flex items-center justify-between pt-3">
                       <div className="inline-flex items-center rounded-full border border-ink/12 bg-white">
                         <button

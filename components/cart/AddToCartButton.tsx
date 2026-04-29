@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useCart } from "./CartProvider";
+import type { PricingTier } from "@/lib/supabase";
 
 type ProductInput = {
   product_id: string;
@@ -10,6 +11,8 @@ type ProductInput = {
   name: string;
   price: number;
   image: string | null;
+  pricing_tiers?: PricingTier[];
+  min_order_quantity?: number;
 };
 
 export default function AddToCartButton({
@@ -29,7 +32,8 @@ export default function AddToCartButton({
 }) {
   const router = useRouter();
   const { add } = useCart();
-  const [quantity, setQuantity] = useState(1);
+  const minQty = product.min_order_quantity ?? 1;
+  const [quantity, setQuantity] = useState(minQty);
   const [added, setAdded] = useState(false);
 
   const handleAdd = () => {
@@ -40,7 +44,18 @@ export default function AddToCartButton({
       );
       return;
     }
-    add(product, quantity);
+    add(
+      {
+        product_id: product.product_id,
+        slug: product.slug,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        pricing_tiers: product.pricing_tiers || [],
+        min_order_quantity: minQty,
+      },
+      Math.max(quantity, minQty),
+    );
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
@@ -66,7 +81,7 @@ export default function AddToCartButton({
       {showQuantity && authed !== false && (
         <div className="inline-flex items-center rounded-full border border-ink/15 bg-white">
           <button
-            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+            onClick={() => setQuantity((q) => Math.max(minQty, q - 1))}
             className="px-4 py-3 text-base text-ink/70 hover:text-ink"
             aria-label="수량 줄이기"
             type="button"

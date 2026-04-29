@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import ImageUploader from "./ImageUploader";
+import type { PricingTier } from "@/lib/supabase";
 
 export type ProductFormValues = {
   id?: string;
@@ -13,6 +14,9 @@ export type ProductFormValues = {
   description: string;
   tags: string[];
   price: number;
+  consumer_price: number | null;
+  pricing_tiers: PricingTier[];
+  min_order_quantity: number;
   stock: number;
   images: string[];
   detail_images: string[];
@@ -28,6 +32,13 @@ export const EMPTY_PRODUCT: ProductFormValues = {
   description: "",
   tags: [],
   price: 0,
+  consumer_price: null,
+  pricing_tiers: [
+    { min_qty: 10, max_qty: 29, price: 0 },
+    { min_qty: 30, max_qty: 49, price: 0 },
+    { min_qty: 50, max_qty: null, price: 0 },
+  ],
+  min_order_quantity: 10,
   stock: 100,
   images: [],
   detail_images: [],
@@ -172,7 +183,7 @@ export default function ProductForm({
 
         {/* Sales */}
         <Card title="판매 정보">
-          <Field label="가격 (원)" required>
+          <Field label="기본 단가 (원)" required hint="구간 단가가 비어있을 때 사용">
             <input
               type="number"
               min={0}
@@ -181,6 +192,32 @@ export default function ProductForm({
               onChange={(e) => update("price", Number(e.target.value))}
               className={inputCls}
               required
+            />
+          </Field>
+          <Field label="소비자가 (원)" hint="공개 페이지에는 비노출, 정가 표기용">
+            <input
+              type="number"
+              min={0}
+              step={100}
+              value={v.consumer_price ?? ""}
+              onChange={(e) =>
+                update(
+                  "consumer_price",
+                  e.target.value === "" ? null : Number(e.target.value),
+                )
+              }
+              className={inputCls}
+            />
+          </Field>
+          <Field label="최소 주문 수량" hint="장바구니에서 클램핑됩니다">
+            <input
+              type="number"
+              min={1}
+              value={v.min_order_quantity}
+              onChange={(e) =>
+                update("min_order_quantity", Math.max(1, Number(e.target.value)))
+              }
+              className={inputCls}
             />
           </Field>
           <Field label="재고">
@@ -215,6 +252,17 @@ export default function ProductForm({
           </Field>
         </Card>
       </div>
+
+      {/* Tier pricing */}
+      <Card
+        title="수량별 단가 (도매 차등 적용)"
+        subtitle="장바구니 수량에 따라 자동 적용됩니다. 마지막 구간의 '최대'는 비워두면 무제한입니다. 비어있으면 위의 '기본 단가'가 모든 수량에 적용됩니다."
+      >
+        <TierEditor
+          tiers={v.pricing_tiers}
+          onChange={(next) => update("pricing_tiers", next)}
+        />
+      </Card>
 
       {/* Gallery images */}
       <Card
@@ -343,5 +391,110 @@ function Field({
       <div className="mt-1.5">{children}</div>
       {hint && <p className="mt-1 text-xs text-ink/40">{hint}</p>}
     </label>
+  );
+}
+
+function TierEditor({
+  tiers,
+  onChange,
+}: {
+  tiers: PricingTier[];
+  onChange: (next: PricingTier[]) => void;
+}) {
+  function update(i: number, patch: Partial<PricingTier>) {
+    onChange(tiers.map((t, idx) => (idx === i ? { ...t, ...patch } : t)));
+  }
+  function remove(i: number) {
+    onChange(tiers.filter((_, idx) => idx !== i));
+  }
+  function add() {
+    const last = tiers[tiers.length - 1];
+    const nextMin = last ? (last.max_qty ?? last.min_qty) + 1 : 10;
+    onChange([...tiers, { min_qty: nextMin, max_qty: null, price: 0 }]);
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="overflow-hidden rounded-xl ring-1 ring-black/10">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-[#fafafa] text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/55">
+              <th className="px-4 py-3 text-left">구간 시작 (개)</th>
+              <th className="px-4 py-3 text-left">구간 끝 (개, 비우면 무제한)</th>
+              <th className="px-4 py-3 text-left">단가 (원)</th>
+              <th className="px-2 py-3 text-right" aria-label="작업"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {tiers.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="px-4 py-6 text-center text-xs text-ink/50">
+                  구간이 비어 있습니다. '구간 추가'로 시작해주세요.
+                </td>
+              </tr>
+            ) : (
+              tiers.map((t, i) => (
+                <tr key={i} className="border-t border-black/5">
+                  <td className="px-4 py-2.5">
+                    <input
+                      type="number"
+                      min={1}
+                      value={t.min_qty}
+                      onChange={(e) =>
+                        update(i, { min_qty: Math.max(1, Number(e.target.value)) })
+                      }
+                      className="w-24 rounded-lg border border-ink/12 px-3 py-2 text-sm outline-none focus:border-ink"
+                    />
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <input
+                      type="number"
+                      min={0}
+                      value={t.max_qty ?? ""}
+                      placeholder="무제한"
+                      onChange={(e) =>
+                        update(i, {
+                          max_qty:
+                            e.target.value === "" ? null : Number(e.target.value),
+                        })
+                      }
+                      className="w-32 rounded-lg border border-ink/12 px-3 py-2 text-sm outline-none focus:border-ink"
+                    />
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <input
+                      type="number"
+                      min={0}
+                      step={100}
+                      value={t.price}
+                      onChange={(e) =>
+                        update(i, { price: Math.max(0, Number(e.target.value)) })
+                      }
+                      className="w-32 rounded-lg border border-ink/12 px-3 py-2 text-sm outline-none focus:border-ink"
+                    />
+                  </td>
+                  <td className="px-2 py-2.5 text-right">
+                    <button
+                      type="button"
+                      onClick={() => remove(i)}
+                      className="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-100"
+                    >
+                      삭제
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+      <button
+        type="button"
+        onClick={add}
+        className="rounded-full border border-ink/15 px-4 py-2 text-xs font-semibold text-ink/80 transition hover:border-ink hover:text-ink"
+      >
+        + 구간 추가
+      </button>
+    </div>
   );
 }

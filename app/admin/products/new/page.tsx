@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isAdmin } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
+import { validateTiers } from "@/lib/pricing";
 import ProductForm, {
   EMPTY_PRODUCT,
   type ProductFormValues,
@@ -25,6 +26,9 @@ async function createProduct(values: ProductFormValues) {
     return { ok: false, error: "이미 사용 중인 slug입니다." };
   }
 
+  const tierError = validateTiers(values.pricing_tiers);
+  if (tierError) return { ok: false, error: tierError };
+
   const { data, error } = await supabaseAdmin()
     .from("products")
     .insert({
@@ -35,6 +39,9 @@ async function createProduct(values: ProductFormValues) {
       description: values.description.trim() || null,
       tags: values.tags,
       price: values.price,
+      consumer_price: values.consumer_price,
+      pricing_tiers: values.pricing_tiers,
+      min_order_quantity: values.min_order_quantity,
       stock: values.stock,
       images: values.images,
       detail_images: values.detail_images,

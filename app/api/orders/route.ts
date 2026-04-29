@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getUserIdFromCookie } from "@/lib/customer-auth";
+import { resolveUnitPrice, volumeDiscount } from "@/lib/pricing";
 
 const SHIPPING_FEE = 3000;
 const FREE_SHIPPING_OVER = 50000;
@@ -80,7 +81,9 @@ export async function POST(req: Request) {
   const ids = body.items.map((i) => i.product_id);
   const { data: products, error: queryError } = await supabaseAdmin()
     .from("products")
-    .select("id, slug, name, price, stock, status, images")
+    .select(
+      "id, slug, name, price, stock, status, images, pricing_tiers, min_order_quantity",
+    )
     .in("id", ids);
 
   if (queryError) {
@@ -103,15 +106,26 @@ export async function POST(req: Request) {
       if (p.status !== "active") {
         throw new Error(`'${p.name}'은 현재 판매중이 아닙니다.`);
       }
-      if (line.quantity <= 0) throw new Error("수량이 올바르지 않습니다.");
+      const minQty = p.min_order_quantity ?? 1;
+      if (line.quantity < minQty) {
+        throw new Error(
+          `'${p.name}'의 최소 주문 수량은 ${minQty}개입니다.`,
+        );
+      }
       if ((p.stock ?? 0) < line.quantity) {
         throw new Error(`'${p.name}'의 재고가 부족합니다.`);
       }
+      // Authoritative: resolve unit price from server-side tiers
+      const unit = resolveUnitPrice(
+        p.pricing_tiers || [],
+        line.quantity,
+        p.price,
+      ).price;
       return {
         product_id: p.id,
         slug: p.slug,
         name: p.name,
-        price: p.price,
+        price: unit,
         quantity: line.quantity,
         image:
           Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
@@ -128,8 +142,9 @@ export async function POST(req: Request) {
     (s, it) => s + it.price * it.quantity,
     0,
   );
+  const discount = volumeDiscount(subtotal);
   const shipping_fee = subtotal >= FREE_SHIPPING_OVER ? 0 : SHIPPING_FEE;
-  const total = subtotal + shipping_fee;
+  const total = subtotal - discount + shipping_fee;
   const order_number = genOrderNumber();
 
   // Tax invoice: never issue for simplified-tax users; otherwise honor request flag
@@ -151,6 +166,7 @@ export async function POST(req: Request) {
       items: validatedItems,
       subtotal,
       shipping_fee,
+      discount_amount: discount,
       total,
       payment_status: "pending",
       memo: body.memo?.trim() || null,

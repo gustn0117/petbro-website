@@ -3,6 +3,7 @@ import Link from "next/link";
 import { supabasePublic, type Product } from "@/lib/supabase";
 import AddToCartButton from "@/components/cart/AddToCartButton";
 import { getCurrentUser } from "@/lib/customer-auth";
+import { startingPrice } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "제품 · SHOP | PAT BRO 펫브로",
@@ -165,12 +166,25 @@ export default async function ProductsPage() {
                     )}
                   </div>
                   {approved ? (
-                    <p className="shrink-0 text-base font-extrabold tracking-tightest text-ink md:text-lg">
-                      {p.price.toLocaleString()}
-                      <span className="ml-0.5 text-xs font-semibold text-ink/60">
-                        원
-                      </span>
-                    </p>
+                    (() => {
+                      const sp = startingPrice(p.pricing_tiers, p.price);
+                      const hasTiers = (p.pricing_tiers?.length ?? 0) > 0;
+                      return (
+                        <div className="shrink-0 text-right">
+                          <p className="text-base font-extrabold tracking-tightest text-ink md:text-lg">
+                            {sp.price.toLocaleString()}
+                            <span className="ml-0.5 text-xs font-semibold text-ink/60">
+                              원{hasTiers ? "~" : ""}
+                            </span>
+                          </p>
+                          {hasTiers && sp.tier && (
+                            <p className="mt-0.5 text-[10px] font-semibold tracking-[0.12em] text-brand">
+                              {sp.tier.min_qty}ea+ 기준
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()
                   ) : (
                     <Link
                       href={`/login?redirect=/products`}
@@ -199,6 +213,8 @@ export default async function ProductsPage() {
                       name: p.name,
                       price: p.price,
                       image: p.images[0] || null,
+                      pricing_tiers: p.pricing_tiers || [],
+                      min_order_quantity: p.min_order_quantity ?? 10,
                     }}
                     disabled={p.stock <= 0}
                     variant="compact"

@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { useCart } from "@/components/cart/CartProvider";
+import { useCart, unitPriceForItem } from "@/components/cart/CartProvider";
 import { loadTossPayments } from "@tosspayments/payment-sdk";
+import { volumeDiscount, PRICING_CONSTANTS } from "@/lib/pricing";
 
 const SHIPPING_FEE = 3000;
 const FREE_SHIPPING_OVER = 50000;
@@ -47,11 +48,13 @@ export default function CheckoutClient({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const discount = useMemo(() => volumeDiscount(subtotal), [subtotal]);
+  const subtotalAfterDiscount = subtotal - discount;
   const shippingFee = useMemo(
     () => (subtotal === 0 || subtotal >= FREE_SHIPPING_OVER ? 0 : SHIPPING_FEE),
     [subtotal],
   );
-  const total = subtotal + shippingFee;
+  const total = subtotalAfterDiscount + shippingFee;
 
   useEffect(() => {
     if (hydrated && items.length === 0) {
@@ -290,30 +293,45 @@ export default function CheckoutClient({
                 주문 상품
               </h2>
               <ul className="mt-4 space-y-3 border-b border-black/5 pb-4">
-                {items.map((it) => (
-                  <li key={it.product_id} className="flex items-center gap-3 text-sm">
-                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-cream">
-                      {it.image && (
-                        <img
-                          src={it.image}
-                          alt=""
-                          className="h-full w-full object-cover"
-                        />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-ink">{it.name}</p>
-                      <p className="text-xs text-ink/50">수량 {it.quantity}</p>
-                    </div>
-                    <p className="font-semibold text-ink">
-                      {(it.price * it.quantity).toLocaleString()}원
-                    </p>
-                  </li>
-                ))}
+                {items.map((it) => {
+                  const unit = unitPriceForItem(it);
+                  return (
+                    <li
+                      key={it.product_id}
+                      className="flex items-center gap-3 text-sm"
+                    >
+                      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-cream">
+                        {it.image && (
+                          <img
+                            src={it.image}
+                            alt=""
+                            className="h-full w-full object-cover"
+                          />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-ink">{it.name}</p>
+                        <p className="text-xs text-ink/50">
+                          {unit.toLocaleString()}원 × {it.quantity}
+                        </p>
+                      </div>
+                      <p className="font-semibold text-ink">
+                        {(unit * it.quantity).toLocaleString()}원
+                      </p>
+                    </li>
+                  );
+                })}
               </ul>
 
               <dl className="mt-4 space-y-2 text-sm">
                 <Row label="상품 합계" value={`${subtotal.toLocaleString()}원`} />
+                {discount > 0 && (
+                  <Row
+                    label={`대량 주문 할인 (${PRICING_CONSTANTS.VOLUME_THRESHOLD.toLocaleString()}원당 ${PRICING_CONSTANTS.VOLUME_DISCOUNT_PER.toLocaleString()}원)`}
+                    value={`-${discount.toLocaleString()}원`}
+                    accent
+                  />
+                )}
                 <Row
                   label="배송비"
                   value={shippingFee === 0 ? "무료" : `${shippingFee.toLocaleString()}원`}
@@ -414,11 +432,21 @@ function ReadOnly({
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+}) {
   return (
-    <div className="flex items-center justify-between text-ink/70">
-      <span>{label}</span>
-      <span className="text-ink">{value}</span>
+    <div
+      className={`flex items-center justify-between ${accent ? "text-brand" : "text-ink/70"}`}
+    >
+      <span className={accent ? "font-semibold" : ""}>{label}</span>
+      <span className={accent ? "font-bold" : "text-ink"}>{value}</span>
     </div>
   );
 }
