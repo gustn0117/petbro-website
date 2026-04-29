@@ -44,6 +44,13 @@ body {
   border-radius: 0;
 }
 
+@layer base {
+  /* Korean heading defaults — guarded against tailwind text-Nxl line-height */
+  h1, h2, h3, h4 {
+    word-break: keep-all;
+  }
+}
+
 @layer utilities {
   .container-x {
     @apply mx-auto w-full max-w-[1440px] px-6 md:px-10 lg:px-16;

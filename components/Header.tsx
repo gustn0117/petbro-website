@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useCart } from "./cart/CartProvider";
 
 const NAV = [
   { href: "/about", label: "ABOUT", kr: "회사소개" },
@@ -17,6 +18,7 @@ export default function Header() {
   const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { totalQuantity, open: openCart, hydrated } = useCart();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -43,6 +45,7 @@ export default function Header() {
       }`}
     >
       <div className="container-x flex h-[72px] items-center justify-between md:h-[84px]">
+        {/* Logo */}
         <Link
           href="/"
           aria-label="PAT BRO 펫브로 홈"
@@ -65,6 +68,7 @@ export default function Header() {
           </span>
         </Link>
 
+        {/* Desktop nav */}
         <nav className="hidden items-center gap-9 lg:flex">
           {NAV.map((item) => {
             const active = pathname === item.href;
@@ -89,10 +93,11 @@ export default function Header() {
           })}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        {/* Right side: tel + cart + hamburger */}
+        <div className="flex items-center gap-3">
           <a
             href="tel:010-2466-2313"
-            className={`rounded-full border px-5 py-2.5 text-xs font-semibold tracking-[0.14em] transition-all ${
+            className={`hidden rounded-full border px-5 py-2.5 text-xs font-semibold tracking-[0.14em] transition-all lg:inline-flex ${
               solid
                 ? "border-ink text-ink hover:bg-ink hover:text-white"
                 : "border-white/60 text-white hover:bg-white hover:text-ink"
@@ -100,31 +105,62 @@ export default function Header() {
           >
             도매문의 010-2466-2313
           </a>
-        </div>
 
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className={`relative h-10 w-10 lg:hidden ${
-            solid || open ? "text-ink" : "text-white"
-          }`}
-          aria-label="메뉴 열기"
-        >
-          <span
-            className={`absolute left-2 top-3 h-0.5 w-6 bg-current transition-all ${
-              open ? "translate-y-2 rotate-45" : ""
+          <button
+            onClick={openCart}
+            aria-label="장바구니 열기"
+            className={`relative inline-flex h-10 w-10 items-center justify-center rounded-full transition ${
+              solid
+                ? "text-ink hover:bg-ink hover:text-white"
+                : "text-white hover:bg-white/15"
             }`}
-          />
-          <span
-            className={`absolute left-2 top-[18px] h-0.5 w-6 bg-current transition-all ${
-              open ? "opacity-0" : ""
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+            {hydrated && totalQuantity > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex min-w-[18px] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-[18px] text-white">
+                {totalQuantity > 99 ? "99+" : totalQuantity}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className={`relative h-10 w-10 lg:hidden ${
+              solid || open ? "text-ink" : "text-white"
             }`}
-          />
-          <span
-            className={`absolute left-2 top-6 h-0.5 w-6 bg-current transition-all ${
-              open ? "-translate-y-2 -rotate-45" : ""
-            }`}
-          />
-        </button>
+            aria-label="메뉴 열기"
+          >
+            <span
+              className={`absolute left-2 top-3 h-0.5 w-6 bg-current transition-all ${
+                open ? "translate-y-2 rotate-45" : ""
+              }`}
+            />
+            <span
+              className={`absolute left-2 top-[18px] h-0.5 w-6 bg-current transition-all ${
+                open ? "opacity-0" : ""
+              }`}
+            />
+            <span
+              className={`absolute left-2 top-6 h-0.5 w-6 bg-current transition-all ${
+                open ? "-translate-y-2 -rotate-45" : ""
+              }`}
+            />
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}

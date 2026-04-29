@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import RevealOnScroll from "@/components/RevealOnScroll";
+import SiteChrome from "@/components/SiteChrome";
+import { CartProvider } from "@/components/cart/CartProvider";
 
 export const metadata: Metadata = {
   title: "PAT BRO 펫브로 — 위생을 최우선시 하는 애견간식 제조업체",
@@ -35,10 +34,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="bg-white text-ink antialiased">
-        <Header />
-        <main className="relative">{children}</main>
-        <Footer />
-        <RevealOnScroll />
+        <CartProvider>
+          <SiteChrome>{children}</SiteChrome>
+        </CartProvider>
       </body>
     </html>
   );
