@@ -327,43 +327,38 @@ export default function CheckoutClient({
                 )}
               </dl>
 
-              {/* VAT toggle */}
-              <button
-                type="button"
-                onClick={() => setAddVat((v) => !v)}
-                className={`mt-3 flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm font-semibold transition ${
-                  addVat
-                    ? "border-ink bg-ink text-white"
-                    : "border-ink/15 bg-white text-ink hover:border-ink"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <span
-                    className={`flex h-4 w-4 items-center justify-center rounded border ${
-                      addVat
-                        ? "border-white bg-white text-ink"
-                        : "border-ink/40 bg-white"
+              {/* VAT — 포함 / 미포함 segmented buttons */}
+              <div className="mt-3">
+                <p className="mb-1.5 text-[11px] font-semibold tracking-[0.2em] text-ink/55">
+                  부가세 (10%)
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setAddVat(false)}
+                    aria-pressed={!addVat}
+                    className={`rounded-xl border-2 px-4 py-3 text-sm font-semibold transition ${
+                      !addVat
+                        ? "border-ink bg-ink text-white"
+                        : "border-ink/15 bg-white text-ink hover:border-ink/40"
                     }`}
                   >
-                    {addVat && (
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="3"
-                      >
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    )}
-                  </span>
-                  부가세 요청 (10% 추가)
-                </span>
-                <span className={addVat ? "text-brand-200" : "text-ink/55"}>
-                  {addVat ? `+${vat.toLocaleString()}원` : "선택 안 함"}
-                </span>
-              </button>
+                    부가세 미포함
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAddVat(true)}
+                    aria-pressed={addVat}
+                    className={`rounded-xl border-2 px-4 py-3 text-sm font-semibold transition ${
+                      addVat
+                        ? "border-ink bg-ink text-white"
+                        : "border-ink/15 bg-white text-ink hover:border-ink/40"
+                    }`}
+                  >
+                    부가세 포함{addVat && ` (+${vat.toLocaleString()}원)`}
+                  </button>
+                </div>
+              </div>
               <div className="mt-4 flex items-baseline justify-between border-t border-black/10 pt-4">
                 <span className="text-sm font-semibold text-ink">총 결제금액</span>
                 <span className="font-display text-2xl font-extrabold tracking-tightest text-ink">
