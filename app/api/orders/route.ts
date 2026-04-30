@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getUserIdFromCookie } from "@/lib/customer-auth";
 import { resolveUnitPrice, volumeDiscount } from "@/lib/pricing";
-import { renderNewOrderEmail, sendEmail } from "@/lib/email";
+import { renderNewOrderNotification, sendNotification } from "@/lib/email";
 
 const SHIPPING_FEE = 3000;
 const FREE_SHIPPING_OVER = 100000;
@@ -192,7 +192,7 @@ export async function POST(req: Request) {
 
   // Fire off the operator notification email. Don't await — don't block
   // the customer's redirect on email infrastructure availability.
-  const mailBody = renderNewOrderEmail({
+  const notification = renderNewOrderNotification({
     order_number,
     customer_name: body.customer_name.trim(),
     customer_phone: body.customer_phone.trim(),
@@ -215,7 +215,7 @@ export async function POST(req: Request) {
     issue_tax_invoice: issueTaxInvoice,
     tax_email: issueTaxInvoice ? userRow.tax_email : null,
   });
-  sendEmail(mailBody).then((r) => {
+  sendNotification(notification).then((r) => {
     if (!r.ok) console.warn("[email] order notification failed:", r.error);
   });
 
