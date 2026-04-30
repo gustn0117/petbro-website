@@ -48,8 +48,17 @@ export default function PartnerForm({
     setError(null);
     if (!v.name.trim()) return setError("파트너사명을 입력해주세요.");
     startTransition(async () => {
-      const res = await action(v);
-      if (!res.ok) setError(res.error || "저장에 실패했습니다.");
+      try {
+        const res = await action(v);
+        if (res?.ok) {
+          window.location.assign("/admin/partners");
+          return;
+        }
+        if (res && !res.ok) setError(res.error || "저장에 실패했습니다.");
+      } catch (e: any) {
+        if (e?.digest?.startsWith?.("NEXT_REDIRECT")) return;
+        setError(e?.message || "저장 중 오류가 발생했습니다.");
+      }
     });
   }
 

@@ -26,7 +26,7 @@ async function createPartner(values: PartnerFormValues) {
 
   revalidatePath("/admin/partners");
   revalidatePath("/partners");
-  redirect("/admin/partners");
+  return { ok: true };
 }
 
 export default function NewPartnerPage() {

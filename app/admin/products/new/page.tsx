@@ -57,7 +57,7 @@ async function createProduct(values: ProductFormValues) {
 
   revalidatePath("/admin/products");
   revalidatePath("/products");
-  redirect("/admin/products");
+  return { ok: true };
 }
 
 export default function NewProductPage() {

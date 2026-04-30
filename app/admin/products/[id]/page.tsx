@@ -66,7 +66,10 @@ async function updateProduct(values: ProductFormValues) {
   revalidatePath(`/admin/products/${values.id}`);
   revalidatePath("/products");
   revalidatePath(`/products/${slug}`);
-  redirect("/admin/products");
+  // Return success and let the client do a hard navigation so the
+  // Next.js router cache (which would otherwise serve a stale RSC
+  // payload for /admin/products/[id]) is bypassed entirely.
+  return { ok: true };
 }
 
 export default async function EditProductPage({

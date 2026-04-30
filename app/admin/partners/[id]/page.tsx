@@ -36,8 +36,9 @@ async function updatePartner(values: PartnerFormValues) {
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/admin/partners");
+  revalidatePath(`/admin/partners/${values.id}`);
   revalidatePath("/partners");
-  redirect("/admin/partners");
+  return { ok: true };
 }
 
 export default async function EditPartnerPage({

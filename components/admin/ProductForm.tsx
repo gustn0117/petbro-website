@@ -89,12 +89,14 @@ export default function ProductForm({
     startTransition(async () => {
       try {
         const res = await action(v);
-        // Successful actions call redirect() and never return; this only
-        // hits when the action explicitly returned a {ok:false} payload.
+        if (res?.ok) {
+          // Hard navigation bypasses the Next.js client router cache so
+          // a re-open of the edit page picks up the freshly saved data.
+          window.location.assign("/admin/products");
+          return;
+        }
         if (res && !res.ok) setError(res.error || "저장에 실패했습니다.");
       } catch (e: any) {
-        // redirect() throws NEXT_REDIRECT — the framework handles it.
-        // Anything else is a real error worth surfacing.
         if (e?.digest?.startsWith?.("NEXT_REDIRECT")) return;
         setError(e?.message || "저장 중 오류가 발생했습니다.");
       }
