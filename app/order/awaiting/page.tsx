@@ -86,17 +86,25 @@ export default async function OrderAwaitingPage({
             </div>
           ) : (
             <div className="text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-50 text-2xl text-amber-700">
-                ◔
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-3xl text-emerald-700">
+                ✓
               </div>
-              <p className="mt-6 text-[11px] font-semibold tracking-[0.3em] text-amber-700">
-                AWAITING TRANSFER
+              <p className="mt-6 text-[11px] font-semibold tracking-[0.3em] text-emerald-700">
+                ORDER PLACED
               </p>
               <h1 className="mt-2 text-3xl font-extrabold tracking-tightest text-ink md:text-4xl">
-                주문이 접수되었습니다.
+                주문이 완료되었습니다.
               </h1>
               <p className="mt-3 text-sm text-ink/65">
-                아래 계좌로 입금해주시면 확인 후 발송이 진행됩니다.
+                아래 계좌로 입금해주시면 확인 후 발송됩니다.
+                <br />
+                <Link
+                  href="/account/orders"
+                  className="font-semibold text-brand underline-offset-2 hover:underline"
+                >
+                  내 정보
+                </Link>{" "}
+                에서 주문 내역과 송장 번호를 확인하실 수 있습니다.
               </p>
             </div>
           )}
@@ -216,10 +224,10 @@ export default async function OrderAwaitingPage({
               쇼핑 계속하기
             </Link>
             <Link
-              href="/"
+              href="/account/orders"
               className="rounded-full bg-ink px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-brand"
             >
-              홈으로
+              주문 내역 확인 →
             </Link>
           </div>
         </div>

@@ -22,6 +22,7 @@ export default async function CheckoutPage() {
       defaultName={user.name}
       defaultEmail={user.email}
       defaultPhone={user.phone || ""}
+      defaultAddress={user.business_address || ""}
       taxInfo={{
         business_name: user.business_name || "",
         business_number: user.business_number || "",

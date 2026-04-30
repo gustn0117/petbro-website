@@ -25,11 +25,13 @@ export default function CheckoutClient({
   defaultName = "",
   defaultEmail = "",
   defaultPhone = "",
+  defaultAddress = "",
   taxInfo,
 }: {
   defaultName?: string;
   defaultEmail?: string;
   defaultPhone?: string;
+  defaultAddress?: string;
   taxInfo?: TaxInfo;
 }) {
   const router = useRouter();
@@ -43,7 +45,7 @@ export default function CheckoutClient({
     customer_phone: defaultPhone,
     customer_email: defaultEmail,
     postcode: "",
-    address: "",
+    address: defaultAddress,
     address_detail: "",
     memo: "",
   });
@@ -220,7 +222,16 @@ export default function CheckoutClient({
                     placeholder="00000"
                   />
                 </Field>
-                <Field label="주소" required>
+                <Field
+                  label="주소"
+                  required
+                  hint={
+                    defaultAddress &&
+                    form.address === defaultAddress
+                      ? "회원 정보의 사업장 주소가 자동 입력되었습니다. 다른 주소면 수정해주세요."
+                      : undefined
+                  }
+                >
                   <input
                     value={form.address}
                     onChange={(e) => update("address", e.target.value)}
@@ -416,11 +427,13 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 function Field({
   label,
   required,
+  hint,
   className = "",
   children,
 }: {
   label: string;
   required?: boolean;
+  hint?: string;
   className?: string;
   children: React.ReactNode;
 }) {
@@ -431,6 +444,7 @@ function Field({
         {required && <span className="ml-1 text-red-600">*</span>}
       </span>
       <div className="mt-1.5">{children}</div>
+      {hint && <p className="mt-1 text-xs text-brand">{hint}</p>}
     </label>
   );
 }

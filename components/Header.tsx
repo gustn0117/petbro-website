@@ -171,6 +171,13 @@ export default function Header({ user }: { user: ChromeUser }) {
                   </p>
                   <p className="truncate text-xs text-ink/55">{user.email}</p>
                 </div>
+                <Link
+                  href="/account/orders"
+                  onClick={() => setAccountOpen(false)}
+                  className="block border-b border-black/5 px-4 py-3 text-sm font-semibold text-ink/80 transition hover:bg-cream hover:text-ink"
+                >
+                  주문 내역
+                </Link>
                 <form action="/api/auth/logout" method="post">
                   <button
                     type="submit"
@@ -299,25 +306,34 @@ export default function Header({ user }: { user: ChromeUser }) {
           {/* Account section (mobile) */}
           <div className="mt-6 border-t border-black/10 pt-6">
             {user ? (
-              <div className="flex items-center justify-between">
-                <div className="min-w-0">
-                  <p className="text-[10px] font-semibold tracking-[0.3em] text-ink/50">
-                    SIGNED IN
-                  </p>
-                  <p className="mt-1 truncate text-base font-semibold text-ink">
-                    {user.name}
-                  </p>
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-semibold tracking-[0.3em] text-ink/50">
+                      SIGNED IN
+                    </p>
+                    <p className="mt-1 truncate text-base font-semibold text-ink">
+                      {user.name}
+                    </p>
+                  </div>
+                  <form action="/api/auth/logout" method="post">
+                    <button
+                      type="submit"
+                      onClick={() => setOpen(false)}
+                      className="rounded-full border border-ink/15 px-4 py-2 text-xs font-semibold text-ink/80 hover:border-ink hover:text-ink"
+                    >
+                      로그아웃
+                    </button>
+                  </form>
                 </div>
-                <form action="/api/auth/logout" method="post">
-                  <button
-                    type="submit"
-                    onClick={() => setOpen(false)}
-                    className="rounded-full border border-ink/15 px-4 py-2 text-xs font-semibold text-ink/80 hover:border-ink hover:text-ink"
-                  >
-                    로그아웃
-                  </button>
-                </form>
-              </div>
+                <Link
+                  href="/account/orders"
+                  onClick={() => setOpen(false)}
+                  className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-brand hover:underline"
+                >
+                  주문 내역 확인 →
+                </Link>
+              </>
             ) : (
               <div className="grid grid-cols-2 gap-3">
                 <Link
