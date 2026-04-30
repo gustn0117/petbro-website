@@ -234,9 +234,9 @@ export default function CartDrawer({ authed }: { authed: boolean }) {
               </span>
             </div>
             <p className="mt-1 text-xs text-ink/50">
-              {subtotal >= 50000
+              {subtotal >= 100000
                 ? "✓ 무료배송 적용"
-                : `${(50000 - subtotal).toLocaleString()}원 추가 시 무료배송`}
+                : `${(100000 - subtotal).toLocaleString()}원 추가 시 무료배송`}
             </p>
             <Link
               href="/checkout"

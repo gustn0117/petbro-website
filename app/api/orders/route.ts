@@ -4,7 +4,7 @@ import { getUserIdFromCookie } from "@/lib/customer-auth";
 import { resolveUnitPrice, volumeDiscount } from "@/lib/pricing";
 
 const SHIPPING_FEE = 3000;
-const FREE_SHIPPING_OVER = 50000;
+const FREE_SHIPPING_OVER = 100000;
 
 type Body = {
   customer_name?: string;

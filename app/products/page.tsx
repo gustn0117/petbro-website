@@ -109,7 +109,7 @@ export default async function ProductsPage() {
             </p>
           </div>
           <p className="hidden text-xs text-ink/50 md:block">
-            5만원 이상 구매 시 무료배송
+            10만원 이상 구매 시 무료배송
           </p>
         </div>
 

@@ -4,11 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useCart, unitPriceForItem } from "@/components/cart/CartProvider";
-import { loadTossPayments } from "@tosspayments/payment-sdk";
 import { volumeDiscount, PRICING_CONSTANTS } from "@/lib/pricing";
 
 const SHIPPING_FEE = 3000;
-const FREE_SHIPPING_OVER = 50000;
+const FREE_SHIPPING_OVER = 100000;
+
+const BANK_NAME = process.env.NEXT_PUBLIC_BANK_NAME || "NH농협은행";
+const BANK_ACCOUNT = process.env.NEXT_PUBLIC_BANK_ACCOUNT || "301-0295-4839-21";
+const BANK_HOLDER = process.env.NEXT_PUBLIC_BANK_HOLDER || "임정현";
 
 type TaxInfo = {
   business_name: string;
@@ -44,7 +47,6 @@ export default function CheckoutClient({
     address_detail: "",
     memo: "",
   });
-  const [paymentMethod, setPaymentMethod] = useState<"카드" | "계좌이체">("카드");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,7 +79,7 @@ export default function CheckoutClient({
     setLoading(true);
 
     try {
-      // 1. Create order on server (validates stock + price authoritatively)
+      // Create order on server (validates stock + price authoritatively)
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -93,32 +95,11 @@ export default function CheckoutClient({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "주문 생성 실패");
 
-      // 2. Launch Toss Payments
-      const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
-      const toss = await loadTossPayments(clientKey);
-
-      const orderName =
-        items.length === 1
-          ? items[0].name
-          : `${items[0].name} 외 ${items.length - 1}건`;
-
-      const origin =
-        typeof window !== "undefined"
-          ? window.location.origin
-          : process.env.NEXT_PUBLIC_SITE_URL || "";
-
-      // requestPayment redirects on success/fail.
-      await toss.requestPayment(paymentMethod, {
-        amount: data.total,
-        orderId: data.order_number,
-        orderName,
-        customerName: form.customer_name,
-        customerEmail: form.customer_email || undefined,
-        successUrl: `${origin}/order/success`,
-        failUrl: `${origin}/order/fail`,
-      });
+      // Clear cart on successful order creation, redirect to bank-transfer awaiting page
+      clear();
+      router.replace(`/order/awaiting?order=${encodeURIComponent(data.order_number)}`);
     } catch (e: any) {
-      setError(e.message || "결제 진행 중 오류가 발생했습니다.");
+      setError(e.message || "주문 생성 중 오류가 발생했습니다.");
       setLoading(false);
     }
   }
@@ -263,26 +244,23 @@ export default function CheckoutClient({
               </div>
             </Card>
 
-            <Card title="결제 수단">
-              <div className="grid grid-cols-2 gap-3">
-                {(["카드", "계좌이체"] as const).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => setPaymentMethod(m)}
-                    className={`rounded-xl border-2 px-4 py-4 text-sm font-semibold transition ${
-                      paymentMethod === m
-                        ? "border-ink bg-ink text-white"
-                        : "border-ink/15 bg-white text-ink hover:border-ink/40"
-                    }`}
-                  >
-                    {m}
-                  </button>
-                ))}
+            <Card title="결제 방법 · 무통장 입금">
+              <div className="rounded-xl bg-cream px-5 py-4">
+                <p className="text-[11px] font-semibold tracking-[0.3em] text-brand">
+                  입금 계좌
+                </p>
+                <p className="mt-2 font-display text-xl font-extrabold tracking-tightest text-ink md:text-2xl">
+                  {BANK_NAME} {BANK_ACCOUNT}
+                </p>
+                <p className="mt-1 text-sm font-semibold text-ink/80">
+                  예금주 · {BANK_HOLDER}
+                </p>
               </div>
-              <p className="mt-3 text-xs text-ink/50">
-                토스페이먼츠로 안전하게 결제됩니다.
-              </p>
+              <ul className="mt-4 space-y-1.5 text-xs text-ink/70">
+                <li>• 주문 후 안내되는 금액을 위 계좌로 입금해주세요.</li>
+                <li>• 입금자명은 주문자 이름과 동일하게 부탁드립니다.</li>
+                <li>• 입금 확인 후 발송이 진행됩니다 (영업일 기준 1-2일).</li>
+              </ul>
             </Card>
           </div>
 
@@ -345,7 +323,7 @@ export default function CheckoutClient({
               </div>
               <p className="mt-2 text-xs text-ink/50">
                 {subtotal >= FREE_SHIPPING_OVER
-                  ? "5만원 이상 무료배송"
+                  ? "10만원 이상 무료배송"
                   : `${(FREE_SHIPPING_OVER - subtotal).toLocaleString()}원 추가 시 무료배송`}
               </p>
 
@@ -360,7 +338,9 @@ export default function CheckoutClient({
                 disabled={loading}
                 className="mt-5 w-full rounded-full bg-ink py-4 text-sm font-semibold tracking-[0.14em] text-white transition hover:bg-brand disabled:opacity-50"
               >
-                {loading ? "처리 중..." : `${total.toLocaleString()}원 결제하기 →`}
+                {loading
+                  ? "주문 생성 중..."
+                  : `${total.toLocaleString()}원 주문하기 →`}
               </button>
               <Link
                 href="/products"

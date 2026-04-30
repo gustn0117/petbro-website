@@ -51,6 +51,18 @@ export type Product = {
   updated_at: string;
 };
 
+export type Partner = {
+  id: string;
+  name: string;
+  description: string | null;
+  logo_url: string | null;
+  website_url: string | null;
+  display_order: number;
+  status: "active" | "draft";
+  created_at: string;
+  updated_at: string;
+};
+
 export type OrderItem = {
   product_id: string;
   slug: string;

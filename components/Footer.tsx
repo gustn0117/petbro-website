@@ -6,6 +6,7 @@ const NAV_GROUPS = [
     links: [
       { href: "/about", label: "회사소개" },
       { href: "/process", label: "제조공정" },
+      { href: "/partners", label: "파트너사" },
       { href: "/news", label: "언론보도" },
     ],
   },

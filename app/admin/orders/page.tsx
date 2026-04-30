@@ -35,6 +35,67 @@ async function updateFulfillment(formData: FormData) {
   revalidatePath("/admin/orders");
 }
 
+async function confirmPayment(formData: FormData) {
+  "use server";
+  if (!isAdmin()) redirect("/admin");
+  const id = String(formData.get("id"));
+  if (!id) return;
+  // Decrement stock for each item now that payment is confirmed
+  const { data: order } = await supabaseAdmin()
+    .from("orders")
+    .select("items, payment_status")
+    .eq("id", id)
+    .maybeSingle();
+  if (!order || order.payment_status === "paid") {
+    revalidatePath("/admin/orders");
+    return;
+  }
+  if (Array.isArray(order.items)) {
+    for (const it of order.items as any[]) {
+      const { data: prod } = await supabaseAdmin()
+        .from("products")
+        .select("stock")
+        .eq("id", it.product_id)
+        .maybeSingle();
+      if (prod) {
+        await supabaseAdmin()
+          .from("products")
+          .update({
+            stock: Math.max(0, (prod.stock ?? 0) - it.quantity),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", it.product_id);
+      }
+    }
+  }
+  await supabaseAdmin()
+    .from("orders")
+    .update({
+      payment_status: "paid",
+      paid_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      // Move forward in fulfillment if still 'pending'
+      fulfillment_status: "preparing",
+    })
+    .eq("id", id);
+  revalidatePath("/admin/orders");
+}
+
+async function cancelPayment(formData: FormData) {
+  "use server";
+  if (!isAdmin()) redirect("/admin");
+  const id = String(formData.get("id"));
+  if (!id) return;
+  await supabaseAdmin()
+    .from("orders")
+    .update({
+      payment_status: "cancelled",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+  revalidatePath("/admin/orders");
+}
+
 const PAYMENT_BADGE: Record<Order["payment_status"], string> = {
   pending: "bg-amber-100 text-amber-800",
   paid: "bg-emerald-100 text-emerald-800",
@@ -116,9 +177,33 @@ export default async function AdminOrdersPage() {
                   </span>
                   <span className="text-xs text-ink/50">{fmtDate(o.created_at)}</span>
                 </div>
-                <p className="text-base font-extrabold tracking-tightest text-ink">
-                  {o.total.toLocaleString()}원
-                </p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <p className="text-base font-extrabold tracking-tightest text-ink">
+                    {o.total.toLocaleString()}원
+                  </p>
+                  {o.payment_status === "pending" && (
+                    <>
+                      <form action={confirmPayment}>
+                        <input type="hidden" name="id" value={o.id} />
+                        <button
+                          type="submit"
+                          className="rounded-full bg-emerald-600 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700"
+                        >
+                          입금 확인
+                        </button>
+                      </form>
+                      <form action={cancelPayment}>
+                        <input type="hidden" name="id" value={o.id} />
+                        <button
+                          type="submit"
+                          className="rounded-full border border-red-200 bg-red-50 px-4 py-1.5 text-xs font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-100"
+                        >
+                          취소 처리
+                        </button>
+                      </form>
+                    </>
+                  )}
+                </div>
               </header>
 
               <div className="grid gap-6 px-5 py-5 md:grid-cols-[1fr_300px]">

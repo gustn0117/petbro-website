@@ -11,6 +11,7 @@ const NAV = [
   { href: "/about", label: "ABOUT", kr: "회사소개" },
   { href: "/process", label: "PROCESS", kr: "제조공정" },
   { href: "/products", label: "PRODUCTS", kr: "제품" },
+  { href: "/partners", label: "PARTNERS", kr: "파트너사" },
   { href: "/news", label: "NEWS", kr: "언론보도" },
   { href: "/contact", label: "CONTACT", kr: "문의" },
 ];

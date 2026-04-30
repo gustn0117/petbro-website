@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabasePublic, type Product } from "@/lib/supabase";
-import AddToCartButton from "@/components/cart/AddToCartButton";
 import { getCurrentUser } from "@/lib/customer-auth";
 import { startingPrice } from "@/lib/pricing";
 import ProductDetailPriceBlock from "./ProductDetailPriceBlock";
@@ -118,10 +117,16 @@ export default async function ProductDetailPage({
 
             {approved ? (
               <ProductDetailPriceBlock
+                productId={product.id}
+                slug={product.slug}
+                name={product.name}
+                image={product.images[0] || null}
                 consumerPrice={product.consumer_price}
                 basePrice={product.price}
                 pricingTiers={product.pricing_tiers || []}
                 minOrderQuantity={product.min_order_quantity ?? 10}
+                stock={product.stock}
+                authed={approved}
               />
             ) : (
               <div className="mt-8">
@@ -156,30 +161,13 @@ export default async function ProductDetailPage({
               </p>
             )}
 
-            <div className="mt-10 space-y-3">
-              <AddToCartButton
-                product={{
-                  product_id: product.id,
-                  slug: product.slug,
-                  name: product.name,
-                  price: product.price,
-                  image: product.images[0] || null,
-                  pricing_tiers: product.pricing_tiers || [],
-                  min_order_quantity: product.min_order_quantity ?? 10,
-                }}
-                disabled={product.stock <= 0}
-                showQuantity
-                variant="primary"
-                authed={approved}
-                redirectFrom={`/products/${product.slug}`}
-              />
-
-              <p className="text-center text-xs text-ink/50">
+            {approved && (
+              <p className="mt-4 text-center text-xs text-ink/50">
                 {product.stock > 0
                   ? `재고 ${product.stock}개 · 최소 주문 ${product.min_order_quantity ?? 10}개 · 영업일 기준 1-2일 이내 발송`
                   : "현재 품절된 상품입니다"}
               </p>
-            </div>
+            )}
 
             {/* Spec details */}
             <dl className="mt-12 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-black/10 pt-10 text-sm">
