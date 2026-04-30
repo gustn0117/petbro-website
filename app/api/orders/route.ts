@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getUserIdFromCookie } from "@/lib/customer-auth";
 import { resolveUnitPrice, volumeDiscount } from "@/lib/pricing";
+import { renderNewOrderEmail, sendEmail } from "@/lib/email";
 
 const SHIPPING_FEE = 3000;
 const FREE_SHIPPING_OVER = 100000;
@@ -188,6 +189,35 @@ export async function POST(req: Request) {
       { status: 500 },
     );
   }
+
+  // Fire off the operator notification email. Don't await — don't block
+  // the customer's redirect on email infrastructure availability.
+  const mailBody = renderNewOrderEmail({
+    order_number,
+    customer_name: body.customer_name.trim(),
+    customer_phone: body.customer_phone.trim(),
+    customer_email: body.customer_email?.trim() || null,
+    business_name: userRow.business_name,
+    postcode: body.postcode?.trim() || null,
+    address: body.address.trim(),
+    address_detail: body.address_detail?.trim() || null,
+    memo: body.memo?.trim() || null,
+    items: validatedItems.map((i) => ({
+      name: i.name,
+      price: i.price,
+      quantity: i.quantity,
+    })),
+    subtotal,
+    discount_amount: discount,
+    shipping_fee,
+    vat_amount,
+    total,
+    issue_tax_invoice: issueTaxInvoice,
+    tax_email: issueTaxInvoice ? userRow.tax_email : null,
+  });
+  sendEmail(mailBody).then((r) => {
+    if (!r.ok) console.warn("[email] order notification failed:", r.error);
+  });
 
   return NextResponse.json({
     order_id: created.id,
