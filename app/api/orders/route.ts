@@ -15,6 +15,7 @@ type Body = {
   address_detail?: string;
   memo?: string;
   issue_tax_invoice?: boolean;
+  add_vat?: boolean;
   items?: { product_id: string; quantity: number }[];
 };
 
@@ -144,7 +145,9 @@ export async function POST(req: Request) {
   );
   const discount = volumeDiscount(subtotal);
   const shipping_fee = subtotal >= FREE_SHIPPING_OVER ? 0 : SHIPPING_FEE;
-  const total = subtotal - discount + shipping_fee;
+  const supply_amount = subtotal - discount + shipping_fee;
+  const vat_amount = body.add_vat ? Math.round(supply_amount * 0.1) : 0;
+  const total = supply_amount + vat_amount;
   const order_number = genOrderNumber();
 
   // Tax invoice: never issue for simplified-tax users; otherwise honor request flag
@@ -167,6 +170,7 @@ export async function POST(req: Request) {
       subtotal,
       shipping_fee,
       discount_amount: discount,
+      vat_amount,
       total,
       payment_status: "pending",
       memo: body.memo?.trim() || null,

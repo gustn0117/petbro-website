@@ -84,6 +84,8 @@ export type Order = {
   items: OrderItem[];
   subtotal: number;
   shipping_fee: number;
+  discount_amount: number;
+  vat_amount: number;
   total: number;
   payment_status: "pending" | "paid" | "failed" | "cancelled" | "refunded";
   toss_payment_key: string | null;

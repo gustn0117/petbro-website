@@ -49,6 +49,7 @@ export default function CheckoutClient({
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [addVat, setAddVat] = useState(false);
 
   const discount = useMemo(() => volumeDiscount(subtotal), [subtotal]);
   const subtotalAfterDiscount = subtotal - discount;
@@ -56,7 +57,9 @@ export default function CheckoutClient({
     () => (subtotal === 0 || subtotal >= FREE_SHIPPING_OVER ? 0 : SHIPPING_FEE),
     [subtotal],
   );
-  const total = subtotalAfterDiscount + shippingFee;
+  const supplyAmount = subtotalAfterDiscount + shippingFee;
+  const vat = addVat ? Math.round(supplyAmount * 0.1) : 0;
+  const total = supplyAmount + vat;
 
   useEffect(() => {
     if (hydrated && items.length === 0) {
@@ -86,6 +89,7 @@ export default function CheckoutClient({
         body: JSON.stringify({
           ...form,
           issue_tax_invoice: issueTaxInvoice,
+          add_vat: addVat,
           items: items.map((i) => ({
             product_id: i.product_id,
             quantity: i.quantity,
@@ -314,7 +318,52 @@ export default function CheckoutClient({
                   label="배송비"
                   value={shippingFee === 0 ? "무료" : `${shippingFee.toLocaleString()}원`}
                 />
+                {addVat && (
+                  <Row
+                    label="부가세 (10%)"
+                    value={`+${vat.toLocaleString()}원`}
+                    accent
+                  />
+                )}
               </dl>
+
+              {/* VAT toggle */}
+              <button
+                type="button"
+                onClick={() => setAddVat((v) => !v)}
+                className={`mt-3 flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm font-semibold transition ${
+                  addVat
+                    ? "border-ink bg-ink text-white"
+                    : "border-ink/15 bg-white text-ink hover:border-ink"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <span
+                    className={`flex h-4 w-4 items-center justify-center rounded border ${
+                      addVat
+                        ? "border-white bg-white text-ink"
+                        : "border-ink/40 bg-white"
+                    }`}
+                  >
+                    {addVat && (
+                      <svg
+                        width="10"
+                        height="10"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </span>
+                  부가세 요청 (10% 추가)
+                </span>
+                <span className={addVat ? "text-brand-200" : "text-ink/55"}>
+                  {addVat ? `+${vat.toLocaleString()}원` : "선택 안 함"}
+                </span>
+              </button>
               <div className="mt-4 flex items-baseline justify-between border-t border-black/10 pt-4">
                 <span className="text-sm font-semibold text-ink">총 결제금액</span>
                 <span className="font-display text-2xl font-extrabold tracking-tightest text-ink">

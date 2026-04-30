@@ -234,6 +234,46 @@ export default async function AdminOrdersPage() {
                     ))}
                   </ul>
 
+                  {/* Amount breakdown */}
+                  <dl className="mt-5 space-y-1.5 border-t border-black/5 pt-4 text-xs">
+                    <div className="flex justify-between text-ink/65">
+                      <span>상품 합계</span>
+                      <span className="text-ink">
+                        {o.subtotal.toLocaleString()}원
+                      </span>
+                    </div>
+                    {o.discount_amount > 0 && (
+                      <div className="flex justify-between text-brand">
+                        <span>대량 주문 할인</span>
+                        <span className="font-semibold">
+                          -{o.discount_amount.toLocaleString()}원
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-ink/65">
+                      <span>배송비</span>
+                      <span className="text-ink">
+                        {o.shipping_fee === 0
+                          ? "무료"
+                          : `${o.shipping_fee.toLocaleString()}원`}
+                      </span>
+                    </div>
+                    {o.vat_amount > 0 && (
+                      <div className="flex justify-between text-brand">
+                        <span>부가세 (10%)</span>
+                        <span className="font-semibold">
+                          +{o.vat_amount.toLocaleString()}원
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between border-t border-black/5 pt-2 text-sm">
+                      <span className="font-semibold text-ink">합계</span>
+                      <span className="font-bold text-ink">
+                        {o.total.toLocaleString()}원
+                      </span>
+                    </div>
+                  </dl>
+
                   <div className="mt-5 grid grid-cols-2 gap-x-6 gap-y-2 border-t border-black/5 pt-4 text-sm">
                     <Info label="이름" value={o.customer_name} />
                     <Info label="연락처" value={o.customer_phone} />

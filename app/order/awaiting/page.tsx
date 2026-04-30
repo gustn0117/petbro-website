@@ -14,6 +14,31 @@ const BANK_NAME = process.env.NEXT_PUBLIC_BANK_NAME || "NH농협은행";
 const BANK_ACCOUNT = process.env.NEXT_PUBLIC_BANK_ACCOUNT || "301-0295-4839-21";
 const BANK_HOLDER = process.env.NEXT_PUBLIC_BANK_HOLDER || "임정현";
 
+function BreakdownRow({
+  label,
+  value,
+  accent,
+  free,
+}: {
+  label: string;
+  value: number;
+  accent?: boolean;
+  free?: boolean;
+}) {
+  return (
+    <div
+      className={`flex items-center justify-between ${accent ? "text-brand" : "text-ink/65"}`}
+    >
+      <span>{label}</span>
+      <span className={accent ? "font-semibold" : "text-ink"}>
+        {free
+          ? "무료"
+          : `${value < 0 ? "-" : ""}${Math.abs(value).toLocaleString()}원`}
+      </span>
+    </div>
+  );
+}
+
 async function getOrder(orderNumber: string, userId: string): Promise<Order | null> {
   const { data } = await supabaseAdmin()
     .from("orders")
@@ -146,6 +171,36 @@ export default async function OrderAwaitingPage({
                 </dd>
               </div>
             </div>
+
+            {/* Breakdown */}
+            <dl className="mt-4 space-y-1.5 border-t border-ink/8 pt-4 text-xs">
+              <BreakdownRow label="상품 합계" value={order.subtotal} />
+              {order.discount_amount > 0 && (
+                <BreakdownRow
+                  label="대량 주문 할인"
+                  value={-order.discount_amount}
+                  accent
+                />
+              )}
+              <BreakdownRow
+                label="배송비"
+                value={order.shipping_fee}
+                free={order.shipping_fee === 0}
+              />
+              {order.vat_amount > 0 && (
+                <BreakdownRow
+                  label="부가세 (10%)"
+                  value={order.vat_amount}
+                  accent
+                />
+              )}
+              <div className="flex items-center justify-between border-t border-ink/8 pt-2">
+                <span className="font-semibold text-ink">총 결제 금액</span>
+                <span className="font-bold text-ink">
+                  {order.total.toLocaleString()}원
+                </span>
+              </div>
+            </dl>
             <ul className="mt-5 space-y-2 border-t border-ink/8 pt-4 text-xs text-ink/60">
               <li>• 입금 확인 후 발송이 진행됩니다 (영업일 기준 1-2일).</li>
               <li>• 입금이 늦어지는 경우 010-7721-4150 으로 연락해주세요.</li>
