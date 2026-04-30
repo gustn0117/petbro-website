@@ -72,6 +72,33 @@ async function reject(formData: FormData) {
   revalidatePath("/admin/users");
 }
 
+async function updateUserInfo(formData: FormData) {
+  "use server";
+  if (!isAdmin()) redirect("/admin");
+  const id = String(formData.get("id"));
+  if (!id) return;
+
+  const patch: Record<string, string | boolean | null> = {
+    name: String(formData.get("name") || "").trim() || "(미입력)",
+    phone: String(formData.get("phone") || "").trim() || null,
+    business_name: String(formData.get("business_name") || "").trim() || null,
+    business_number:
+      String(formData.get("business_number") || "").trim() || null,
+    business_owner:
+      String(formData.get("business_owner") || "").trim() || null,
+    business_address:
+      String(formData.get("business_address") || "").trim() || null,
+    business_type: String(formData.get("business_type") || "").trim() || null,
+    business_item: String(formData.get("business_item") || "").trim() || null,
+    tax_email: String(formData.get("tax_email") || "").trim() || null,
+    is_simplified_tax: formData.get("is_simplified_tax") === "on",
+    updated_at: new Date().toISOString(),
+  };
+
+  await supabaseAdmin().from("users").update(patch).eq("id", id);
+  revalidatePath("/admin/users");
+}
+
 const STATUS_BADGE: Record<AdminUser["status"], string> = {
   pending: "bg-amber-100 text-amber-800",
   approved: "bg-emerald-100 text-emerald-800",
@@ -171,6 +198,84 @@ export default async function AdminUsersPage() {
                       반려 사유 · {u.reject_reason}
                     </div>
                   )}
+
+                  {/* Inline edit form (collapsible) */}
+                  <details className="col-span-2 mt-2 rounded-lg border border-ink/10 bg-[#fafafa] open:bg-white">
+                    <summary className="cursor-pointer list-none px-4 py-2.5 text-xs font-semibold text-ink/80 hover:text-ink">
+                      ✎ 회원 정보 수정 (사업장 이전 등)
+                    </summary>
+                    <form
+                      action={updateUserInfo}
+                      className="space-y-3 border-t border-ink/8 px-4 py-4"
+                    >
+                      <input type="hidden" name="id" value={u.id} />
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <EditField
+                          label="담당자"
+                          name="name"
+                          defaultValue={u.name}
+                        />
+                        <EditField
+                          label="연락처"
+                          name="phone"
+                          defaultValue={u.phone || ""}
+                        />
+                        <EditField
+                          label="상호"
+                          name="business_name"
+                          defaultValue={u.business_name || ""}
+                        />
+                        <EditField
+                          label="사업자번호"
+                          name="business_number"
+                          defaultValue={u.business_number || ""}
+                          placeholder="123-45-67890"
+                        />
+                        <EditField
+                          label="대표자"
+                          name="business_owner"
+                          defaultValue={u.business_owner || ""}
+                        />
+                        <EditField
+                          label="세금계산서 이메일"
+                          name="tax_email"
+                          type="email"
+                          defaultValue={u.tax_email || ""}
+                        />
+                        <EditField
+                          label="사업장 주소"
+                          name="business_address"
+                          defaultValue={u.business_address || ""}
+                          span
+                        />
+                        <EditField
+                          label="업태"
+                          name="business_type"
+                          defaultValue={u.business_type || ""}
+                        />
+                        <EditField
+                          label="종목"
+                          name="business_item"
+                          defaultValue={u.business_item || ""}
+                        />
+                      </div>
+                      <label className="flex cursor-pointer items-center gap-2 text-xs text-ink/80">
+                        <input
+                          type="checkbox"
+                          name="is_simplified_tax"
+                          defaultChecked={u.is_simplified_tax}
+                          className="h-3.5 w-3.5 accent-ink"
+                        />
+                        간이과세자 (체크 시 세금계산서 발행 안 함)
+                      </label>
+                      <button
+                        type="submit"
+                        className="w-full rounded-lg bg-ink py-2 text-xs font-semibold text-white transition hover:bg-brand"
+                      >
+                        변경사항 저장
+                      </button>
+                    </form>
+                  </details>
                 </div>
 
                 <div className="space-y-3">
@@ -274,6 +379,37 @@ function Info({
         {value}
       </dd>
     </div>
+  );
+}
+
+function EditField({
+  label,
+  name,
+  defaultValue,
+  type = "text",
+  placeholder,
+  span,
+}: {
+  label: string;
+  name: string;
+  defaultValue: string;
+  type?: string;
+  placeholder?: string;
+  span?: boolean;
+}) {
+  return (
+    <label className={`block ${span ? "sm:col-span-2" : ""}`}>
+      <span className="text-[10px] font-semibold tracking-[0.2em] text-ink/55">
+        {label}
+      </span>
+      <input
+        type={type}
+        name={name}
+        defaultValue={defaultValue}
+        placeholder={placeholder}
+        className="mt-1 w-full rounded-lg border border-ink/12 bg-white px-3 py-2 text-sm outline-none focus:border-ink"
+      />
+    </label>
   );
 }
 

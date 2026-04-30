@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { supabaseAdmin, type Order } from "@/lib/supabase";
 import { getUserIdFromCookie } from "@/lib/customer-auth";
+import OrderClearCart from "./OrderClearCart";
 
 export const metadata: Metadata = {
   title: "입금 안내 | PAT BRO 펫브로",
@@ -66,6 +67,7 @@ export default async function OrderAwaitingPage({
 
   return (
     <section className="bg-cream pb-24 pt-32 md:pt-40">
+      <OrderClearCart />
       <div className="container-x">
         <div className="mx-auto max-w-2xl">
           {isPaid ? (

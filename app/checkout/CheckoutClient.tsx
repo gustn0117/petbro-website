@@ -35,7 +35,8 @@ export default function CheckoutClient({
   taxInfo?: TaxInfo;
 }) {
   const router = useRouter();
-  const { items, subtotal, hydrated, clear } = useCart();
+  const { items, subtotal, hydrated } = useCart();
+  const [submitted, setSubmitted] = useState(false);
   const [issueTaxInvoice, setIssueTaxInvoice] = useState(
     taxInfo ? !taxInfo.is_simplified_tax : true,
   );
@@ -64,10 +65,12 @@ export default function CheckoutClient({
   const total = supplyAmount + vat;
 
   useEffect(() => {
-    if (hydrated && items.length === 0) {
+    // Skip the empty-cart redirect once we've kicked off submission so the
+    // race against /order/awaiting navigation doesn't bounce the user back.
+    if (hydrated && items.length === 0 && !submitted) {
       router.replace("/products");
     }
-  }, [hydrated, items.length, router]);
+  }, [hydrated, items.length, router, submitted]);
 
   function update<K extends keyof typeof form>(k: K, v: string) {
     setForm((p) => ({ ...p, [k]: v }));
@@ -101,9 +104,14 @@ export default function CheckoutClient({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "주문 생성 실패");
 
-      // Clear cart on successful order creation, redirect to bank-transfer awaiting page
-      clear();
-      router.replace(`/order/awaiting?order=${encodeURIComponent(data.order_number)}`);
+      // Mark submitted so the empty-cart redirect doesn't fire while we
+      // navigate to the awaiting page. Use a hard navigation so any
+      // pending React effects from the checkout page are torn down
+      // cleanly. The awaiting page handles cart-clearing itself.
+      setSubmitted(true);
+      window.location.assign(
+        `/order/awaiting?order=${encodeURIComponent(data.order_number)}`,
+      );
     } catch (e: any) {
       setError(e.message || "주문 생성 중 오류가 발생했습니다.");
       setLoading(false);

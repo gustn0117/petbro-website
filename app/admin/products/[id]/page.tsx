@@ -63,6 +63,7 @@ async function updateProduct(values: ProductFormValues) {
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/admin/products");
+  revalidatePath(`/admin/products/${values.id}`);
   revalidatePath("/products");
   revalidatePath(`/products/${slug}`);
   redirect("/admin/products");

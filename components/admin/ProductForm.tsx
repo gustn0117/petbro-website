@@ -87,8 +87,17 @@ export default function ProductForm({
     if (v.stock < 0) return setError("재고는 0 이상이어야 합니다.");
 
     startTransition(async () => {
-      const res = await action(v);
-      if (!res.ok) setError(res.error || "저장에 실패했습니다.");
+      try {
+        const res = await action(v);
+        // Successful actions call redirect() and never return; this only
+        // hits when the action explicitly returned a {ok:false} payload.
+        if (res && !res.ok) setError(res.error || "저장에 실패했습니다.");
+      } catch (e: any) {
+        // redirect() throws NEXT_REDIRECT — the framework handles it.
+        // Anything else is a real error worth surfacing.
+        if (e?.digest?.startsWith?.("NEXT_REDIRECT")) return;
+        setError(e?.message || "저장 중 오류가 발생했습니다.");
+      }
     });
   }
 
@@ -187,7 +196,7 @@ export default function ProductForm({
             <input
               type="number"
               min={0}
-              step={100}
+              step={50}
               value={v.price}
               onChange={(e) => update("price", Number(e.target.value))}
               className={inputCls}
@@ -198,7 +207,7 @@ export default function ProductForm({
             <input
               type="number"
               min={0}
-              step={100}
+              step={50}
               value={v.consumer_price ?? ""}
               onChange={(e) =>
                 update(
@@ -465,7 +474,7 @@ function TierEditor({
                     <input
                       type="number"
                       min={0}
-                      step={100}
+                      step={50}
                       value={t.price}
                       onChange={(e) =>
                         update(i, { price: Math.max(0, Number(e.target.value)) })
