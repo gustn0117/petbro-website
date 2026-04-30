@@ -1,30 +1,33 @@
+// Cache-buster bumped after replacing cert images with redacted originals.
+const CV = "?v=2026043016";
+
 const CERTS = [
   {
-    src: "/images/patent-1-drying.jpg",
+    src: `/images/patent-1-drying.jpg${CV}`,
     label: "특허증 · 간식 건조장치",
     en: "Patent No. 10-2379135",
     detail: "애완동물 간식용 건조장치 및 이를 이용한 간식 제조방법",
   },
   {
-    src: "/images/patent-2-rack.jpg",
+    src: `/images/patent-2-rack.jpg${CV}`,
     label: "특허증 · 간식 건조대",
     en: "Patent No. 10-2729562",
     detail: "애완동물 간식 건조대",
   },
   {
-    src: "/images/trademark-class35.jpg",
+    src: `/images/trademark-class35.jpg${CV}`,
     label: "상표등록증 · 제35류",
     en: "Trademark No. 40-2120315",
     detail: "반려동물용 수제간식 도매업 등 10건",
   },
   {
-    src: "/images/trademark-class31.jpg",
+    src: `/images/trademark-class31.jpg${CV}`,
     label: "상표등록증 · 제31류",
     en: "Trademark No. 40-2120314",
     detail: "반려동물용 수제간식 19건",
   },
   {
-    src: "/images/feed-mfg-cert.jpg",
+    src: `/images/feed-mfg-cert.jpg${CV}`,
     label: "사료제조업 등록증",
     en: "Feed Manufacturer Reg.",
     detail: "단미사료 제조업 · 부산광역시장 6260000-502-2021-0027",
