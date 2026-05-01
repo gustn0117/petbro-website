@@ -7,13 +7,11 @@ import { supabasePublic, type Announcement } from "@/lib/supabase";
 
 async function getActiveAnnouncement(): Promise<Announcement | null> {
   try {
-    const now = new Date().toISOString();
     const { data } = await supabasePublic
       .from("announcements")
       .select("*")
       .eq("status", "active")
-      .or(`starts_at.is.null,starts_at.lte.${now}`)
-      .or(`ends_at.is.null,ends_at.gte.${now}`)
+      .not("image_url", "is", null)
       .order("created_at", { ascending: false })
       .limit(1);
     return ((data && data[0]) as Announcement) || null;

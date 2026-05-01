@@ -12,8 +12,7 @@ export default function AnnouncementPopup({ announcement }: { announcement: Anno
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (!announcement) return;
-    // Don't pop on auth/admin/order routes — would interrupt critical flows.
+    if (!announcement || !announcement.image_url) return;
     if (
       !pathname ||
       pathname.startsWith("/login") ||
@@ -25,16 +24,11 @@ export default function AnnouncementPopup({ announcement }: { announcement: Anno
       return;
     }
     try {
-      // Permanent dismissal of this exact announcement
       const persistKey = `${PERSIST_PREFIX}${announcement.id}`;
       if (window.localStorage.getItem(persistKey)) return;
-      // Session-only dismissal (any dismiss this session counts)
       const sessionFlag = window.sessionStorage.getItem(SESSION_KEY);
       if (sessionFlag === announcement.id) return;
-    } catch {
-      // Storage unavailable; show once anyway.
-    }
-    // Slight delay for nicer entrance after page paint
+    } catch {}
     const t = setTimeout(() => setOpen(true), 300);
     return () => clearTimeout(t);
   }, [announcement, pathname]);
@@ -61,7 +55,19 @@ export default function AnnouncementPopup({ announcement }: { announcement: Anno
     setOpen(false);
   }
 
-  if (!announcement) return null;
+  if (!announcement || !announcement.image_url) return null;
+
+  const hasLink = !!announcement.link_url;
+  const isExternal =
+    !!announcement.link_url && announcement.link_url.startsWith("http");
+
+  const imageEl = (
+    <img
+      src={announcement.image_url}
+      alt=""
+      className="block w-full"
+    />
+  );
 
   return (
     <div
@@ -70,7 +76,6 @@ export default function AnnouncementPopup({ announcement }: { announcement: Anno
       }`}
       role="dialog"
       aria-modal={open}
-      aria-labelledby="ann-title"
     >
       <div
         className="absolute inset-0 bg-ink/55 backdrop-blur-sm"
@@ -78,11 +83,11 @@ export default function AnnouncementPopup({ announcement }: { announcement: Anno
         aria-hidden
       />
       <div
-        className={`relative w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        className={`relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           open ? "translate-y-0 scale-100" : "translate-y-6 scale-[0.97]"
         }`}
       >
-        {/* Close button — floats over image when present */}
+        {/* Close button — always visible over the image */}
         <button
           type="button"
           onClick={closeOnce}
@@ -103,48 +108,23 @@ export default function AnnouncementPopup({ announcement }: { announcement: Anno
           </svg>
         </button>
 
-        {/* Image — full width, no padding so it bleeds to edges */}
-        {announcement.image_url && (
-          <div className="bg-cream">
-            <img
-              src={announcement.image_url}
-              alt=""
-              className="block w-full"
-            />
-          </div>
+        {/* Image — clickable if link_url is set */}
+        {hasLink ? (
+          <a
+            href={announcement.link_url!}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noreferrer" : undefined}
+            onClick={closeOnce}
+            className="block"
+          >
+            {imageEl}
+          </a>
+        ) : (
+          imageEl
         )}
 
-        <div className="px-7 pb-6 pt-6">
-          <p className="text-[10px] font-semibold tracking-[0.4em] text-brand">
-            NOTICE · 안내
-          </p>
-          <h2
-            id="ann-title"
-            className="mt-2 font-display text-xl font-extrabold leading-tight tracking-tightest text-ink md:text-2xl"
-          >
-            {announcement.title}
-          </h2>
-
-          {announcement.body && (
-            <p className="mt-4 whitespace-pre-line text-[14px] leading-relaxed text-ink/75">
-              {announcement.body}
-            </p>
-          )}
-
-          {announcement.link_url && (
-            <a
-              href={announcement.link_url}
-              target={announcement.link_url.startsWith("http") ? "_blank" : undefined}
-              rel={announcement.link_url.startsWith("http") ? "noreferrer" : undefined}
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold tracking-[0.14em] text-white transition hover:bg-brand"
-              onClick={closeOnce}
-            >
-              {announcement.link_label || "자세히 보기"} →
-            </a>
-          )}
-        </div>
-
-        <div className="flex items-center justify-between border-t border-black/8 bg-cream px-7 py-3 text-xs">
+        {/* Footer with dismiss controls */}
+        <div className="flex items-center justify-between border-t border-black/8 bg-cream px-5 py-3 text-xs">
           <button
             type="button"
             onClick={closeForever}
