@@ -1,6 +1,55 @@
 // Cache-buster bumped after replacing cert images with redacted originals.
 const CV = "?v=2026043017";
 
+type PressItem = {
+  outlet: string;
+  date: string;
+  title: string;
+  summary: string;
+  url?: string;
+  images?: { src: string; alt: string }[];
+};
+
+const PRESS: PressItem[] = [
+  {
+    outlet: "조은인터뷰",
+    date: "INTERVIEW",
+    title: "펫브로(PAT BRO) 임정현 대표, 새해에 언니우스틱으로 만나요",
+    summary:
+      "위생을 최우선시 하는 애견간식 제조업체 펫브로 임정현 대표 인터뷰. 100% 국내산 한우로 만든 언니우스틱의 시작과 새해 인사를 전합니다.",
+    url: "https://naver.me/FU9vznSp",
+  },
+  {
+    outlet: "피플투데이",
+    date: "INTERVIEW",
+    title: "사람이나 강아지 모두 스트레스 받지 않는 세상",
+    summary:
+      "사람과 반려견 모두가 스트레스 없는 세상을 꿈꾸는 펫브로의 이야기. 위생 우선·국내 최초 특허 기술로 완성한 수제 간식의 철학.",
+    url: "https://naver.me/xqbobtSn",
+  },
+  {
+    outlet: "올치올치",
+    date: "2022",
+    title: "‘2022년 상반기 동물사랑 천사기업’ 선정",
+    summary:
+      "부산시가 반려동물 관련 업체 6개사를 ‘동물사랑 천사기업’으로 선정하고, 부산시 제1호 참여형 반려견 놀이터에서 천사기업 명패 수여식과 기부 물품 전달식을 개최했습니다. 펫브로는 ‘부산시 동물사랑 나눔뱅크’에 반려동물 사료, 의류, 용품 등을 기부하며 사회 공헌에 동참했습니다.",
+    images: [
+      { src: "/images/award-plaque.jpg", alt: "동물사랑 천사기업 명패" },
+      { src: "/images/award-event.jpg", alt: "천사기업 행사" },
+    ],
+  },
+  {
+    outlet: "연합뉴스",
+    date: "2022",
+    title: "부산시, 2022년 유망업종 제조업체 선정",
+    summary:
+      "부산시는 부산경제진흥원과 함께 반려동물 수제 간식 업종 소상공인의 마케팅을 지원했습니다. 펫브로는 유망업종 반려동물 수제간식 사업에 선정되어 온라인 판로 개척 및 온·오프라인 홍보 마케팅을 지원받게 되었습니다.",
+    images: [
+      { src: "/images/food-display.jpg", alt: "펫브로 제품 디스플레이" },
+    ],
+  },
+];
+
 const CERTS = [
   {
     src: `/images/patent-1-drying.jpg${CV}`,
@@ -59,65 +108,76 @@ export default function News() {
 
         {/* Press cards */}
         <div className="mt-16 grid gap-8 md:grid-cols-2 lg:gap-10">
-          <article className="reveal group bg-white p-8 transition-shadow hover:shadow-2xl md:p-10">
-            <div className="flex items-center justify-between">
-              <span className="rounded-full bg-ink px-3 py-1 text-[10px] font-semibold tracking-[0.2em] text-white">
-                PRESS · 올치올치
-              </span>
-              <span className="text-xs text-ink/50">2022</span>
-            </div>
-            <h3 className="mt-6 text-2xl font-extrabold leading-tight text-ink md:text-[28px]">
-              ‘2022년 상반기 동물사랑 천사기업’ 선정
-            </h3>
-            <p className="mt-5 text-[15px] leading-relaxed text-ink/70">
-              부산시가 반려동물 관련 업체 6개사를 ‘동물사랑 천사기업’으로
-              선정하고, 부산시 제1호 참여형 반려견 놀이터에서 천사기업 명패
-              수여식과 기부 물품 전달식을 개최했습니다. 펫브로는 ‘부산시
-              동물사랑 나눔뱅크’에 반려동물 사료, 의류, 용품 등을 기부하며 사회
-              공헌에 동참했습니다.
-            </p>
-            <div className="relative mt-8 grid grid-cols-2 gap-px overflow-hidden bg-ink/10">
-              <div className="aspect-[4/3] bg-cream">
-                <img
-                  src="/images/award-plaque.jpg"
-                  alt="동물사랑 천사기업 명패"
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
-              <div className="aspect-[4/3] bg-cream">
-                <img
-                  src="/images/award-event.jpg"
-                  alt="천사기업 행사"
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
-            </div>
-          </article>
+          {PRESS.map((p, i) => {
+            const cardBody = (
+              <article
+                className={`reveal group h-full bg-white p-8 transition-shadow hover:shadow-2xl md:p-10 reveal-delay-${(i % 4) + 1}`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="rounded-full bg-ink px-3 py-1 text-[10px] font-semibold tracking-[0.2em] text-white">
+                    PRESS · {p.outlet}
+                  </span>
+                  <span className="text-xs text-ink/50">{p.date}</span>
+                </div>
+                <h3 className="mt-6 text-2xl font-extrabold leading-tight text-ink md:text-[28px]">
+                  {p.title}
+                </h3>
+                <p className="mt-5 text-[15px] leading-relaxed text-ink/70">
+                  {p.summary}
+                </p>
 
-          <article className="reveal reveal-delay-1 group bg-white p-8 transition-shadow hover:shadow-2xl md:p-10">
-            <div className="flex items-center justify-between">
-              <span className="rounded-full bg-ink px-3 py-1 text-[10px] font-semibold tracking-[0.2em] text-white">
-                PRESS · 연합뉴스
-              </span>
-              <span className="text-xs text-ink/50">2022</span>
-            </div>
-            <h3 className="mt-6 text-2xl font-extrabold leading-tight text-ink md:text-[28px]">
-              부산시, 2022년 유망업종 제조업체 선정
-            </h3>
-            <p className="mt-5 text-[15px] leading-relaxed text-ink/70">
-              부산시는 부산경제진흥원과 함께 반려동물 수제 간식 업종 소상공인의
-              마케팅을 지원했습니다. 펫브로는 유망업종 반려동물 수제간식 사업에
-              선정되어 온라인 판로 개척 및 온·오프라인 홍보 마케팅을 지원받게
-              되었습니다.
-            </p>
-            <div className="relative mt-8 aspect-[16/10] overflow-hidden bg-cream">
-              <img
-                src="/images/food-display.jpg"
-                alt="펫브로 제품 디스플레이"
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-            </div>
-          </article>
+                {p.images && p.images.length > 0 && (
+                  <div
+                    className={`relative mt-8 overflow-hidden bg-ink/10 ${
+                      p.images.length > 1
+                        ? "grid grid-cols-2 gap-px"
+                        : ""
+                    }`}
+                  >
+                    {p.images.length > 1 ? (
+                      p.images.map((img) => (
+                        <div key={img.src} className="aspect-[4/3] bg-cream">
+                          <img
+                            src={img.src}
+                            alt={img.alt}
+                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="relative aspect-[16/10] bg-cream">
+                        <img
+                          src={p.images[0].src}
+                          alt={p.images[0].alt}
+                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {p.url && (
+                  <span className="mt-6 inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.2em] text-ink transition-colors group-hover:text-brand">
+                    기사 보기 ↗
+                  </span>
+                )}
+              </article>
+            );
+            if (p.url) {
+              return (
+                <a
+                  key={i}
+                  href={p.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block"
+                >
+                  {cardBody}
+                </a>
+              );
+            }
+            return <div key={i}>{cardBody}</div>;
+          })}
         </div>
 
         {/* Certifications */}
