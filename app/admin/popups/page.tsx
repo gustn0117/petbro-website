@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isAdmin } from "@/lib/auth";
 import { supabaseAdmin, type Announcement } from "@/lib/supabase";
+import PopupImageField from "@/components/admin/PopupImageField";
 
 export const dynamic = "force-dynamic";
 
@@ -21,13 +22,14 @@ async function createOne(formData: FormData) {
   await supabaseAdmin().from("announcements").insert({
     title,
     body: String(formData.get("body") || "").trim() || null,
+    image_url: String(formData.get("image_url") || "").trim() || null,
     link_label: String(formData.get("link_label") || "").trim() || null,
     link_url: String(formData.get("link_url") || "").trim() || null,
     status: "active",
     starts_at: String(formData.get("starts_at") || "") || null,
     ends_at: String(formData.get("ends_at") || "") || null,
   });
-  revalidatePath("/admin/announcements");
+  revalidatePath("/admin/popups");
   revalidatePath("/", "layout");
 }
 
@@ -41,6 +43,7 @@ async function updateOne(formData: FormData) {
     .update({
       title: String(formData.get("title") || "").trim() || "(제목 없음)",
       body: String(formData.get("body") || "").trim() || null,
+      image_url: String(formData.get("image_url") || "").trim() || null,
       link_label: String(formData.get("link_label") || "").trim() || null,
       link_url: String(formData.get("link_url") || "").trim() || null,
       starts_at: String(formData.get("starts_at") || "") || null,
@@ -48,7 +51,7 @@ async function updateOne(formData: FormData) {
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
-  revalidatePath("/admin/announcements");
+  revalidatePath("/admin/popups");
   revalidatePath("/", "layout");
 }
 
@@ -64,7 +67,7 @@ async function toggleStatus(formData: FormData) {
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
-  revalidatePath("/admin/announcements");
+  revalidatePath("/admin/popups");
   revalidatePath("/", "layout");
 }
 
@@ -73,7 +76,7 @@ async function deleteOne(formData: FormData) {
   if (!isAdmin()) redirect("/admin");
   const id = String(formData.get("id"));
   await supabaseAdmin().from("announcements").delete().eq("id", id);
-  revalidatePath("/admin/announcements");
+  revalidatePath("/admin/popups");
   revalidatePath("/", "layout");
 }
 
@@ -86,7 +89,6 @@ function dt(d: string | null) {
 }
 
 function dtInput(d: string | null) {
-  // datetime-local needs YYYY-MM-DDTHH:MM (no seconds, local time)
   if (!d) return "";
   const dt = new Date(d);
   const tz = dt.getTimezoneOffset();
@@ -94,7 +96,7 @@ function dtInput(d: string | null) {
   return local.toISOString().slice(0, 16);
 }
 
-export default async function AdminAnnouncementsPage() {
+export default async function AdminPopupsPage() {
   const list = await listAll();
 
   return (
@@ -102,14 +104,15 @@ export default async function AdminAnnouncementsPage() {
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="text-[11px] font-semibold tracking-[0.3em] text-ink/50">
-            ANNOUNCEMENTS
+            POPUPS
           </p>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tightest text-ink">
-            공지사항 팝업
+            팝업 관리
           </h1>
           <p className="mt-1 text-sm text-ink/60">
-            활성 상태인 공지가 사이트 첫 방문 시 팝업으로 노출됩니다. 닫기를
-            누르면 같은 세션에서 다시 안 뜨고, '다시 보지 않기'는 영구 적용됩니다.
+            활성 상태인 팝업이 사이트 첫 방문 시 자동 노출됩니다. 닫기를
+            누르면 같은 세션에서 다시 안 뜨고, '다시 보지 않기'는 영구
+            적용됩니다.
           </p>
         </div>
       </div>
@@ -120,7 +123,7 @@ export default async function AdminAnnouncementsPage() {
         className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5"
       >
         <h2 className="text-sm font-semibold tracking-[0.18em] text-ink/70">
-          + 새 공지 추가
+          + 새 팝업 추가
         </h2>
         <div className="mt-5 grid gap-3 md:grid-cols-2">
           <Field label="제목" required>
@@ -153,18 +156,21 @@ export default async function AdminAnnouncementsPage() {
               placeholder="https://..."
             />
           </Field>
-          <Field label="노출 시작 (선택)" className="md:col-span-1">
+          <Field label="노출 시작 (선택)">
             <input name="starts_at" type="datetime-local" className="field-input" />
           </Field>
-          <Field label="노출 종료 (선택)" className="md:col-span-1">
+          <Field label="노출 종료 (선택)">
             <input name="ends_at" type="datetime-local" className="field-input" />
+          </Field>
+          <Field label="이미지 (선택)" className="md:col-span-2">
+            <PopupImageField />
           </Field>
         </div>
         <button
           type="submit"
           className="mt-4 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand"
         >
-          공지 추가
+          팝업 추가
         </button>
       </form>
 
@@ -172,7 +178,7 @@ export default async function AdminAnnouncementsPage() {
       <div className="mt-8 space-y-4">
         {list.length === 0 ? (
           <div className="rounded-2xl bg-white px-6 py-16 text-center text-sm text-ink/50 ring-1 ring-black/5">
-            등록된 공지가 없습니다.
+            등록된 팝업이 없습니다.
           </div>
         ) : (
           list.map((a) => (
@@ -266,6 +272,9 @@ export default async function AdminAnnouncementsPage() {
                       defaultValue={dtInput(a.ends_at)}
                       className="field-input"
                     />
+                  </Field>
+                  <Field label="이미지" className="md:col-span-2">
+                    <PopupImageField defaultValue={a.image_url} />
                   </Field>
                 </div>
                 <button

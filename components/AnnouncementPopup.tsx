@@ -82,40 +82,51 @@ export default function AnnouncementPopup({ announcement }: { announcement: Anno
           open ? "translate-y-0 scale-100" : "translate-y-6 scale-[0.97]"
         }`}
       >
-        <div className="relative bg-ink px-7 py-6 text-white">
-          <p className="text-[10px] font-semibold tracking-[0.4em] text-brand-200">
-            NOTICE · 공지사항
+        {/* Close button — floats over image when present */}
+        <button
+          type="button"
+          onClick={closeOnce}
+          aria-label="닫기"
+          className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-ink/85 text-white/90 backdrop-blur-sm transition hover:bg-ink hover:text-white"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            aria-hidden
+          >
+            <path d="M6 6 18 18M18 6 6 18" />
+          </svg>
+        </button>
+
+        {/* Image — full width, no padding so it bleeds to edges */}
+        {announcement.image_url && (
+          <div className="bg-cream">
+            <img
+              src={announcement.image_url}
+              alt=""
+              className="block w-full"
+            />
+          </div>
+        )}
+
+        <div className="px-7 pb-6 pt-6">
+          <p className="text-[10px] font-semibold tracking-[0.4em] text-brand">
+            NOTICE · 안내
           </p>
           <h2
             id="ann-title"
-            className="mt-2 font-display text-xl font-extrabold tracking-tightest text-white md:text-2xl"
+            className="mt-2 font-display text-xl font-extrabold leading-tight tracking-tightest text-ink md:text-2xl"
           >
             {announcement.title}
           </h2>
-          <button
-            type="button"
-            onClick={closeOnce}
-            aria-label="닫기"
-            className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-white/70 transition hover:bg-white/10 hover:text-white"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              aria-hidden
-            >
-              <path d="M6 6 18 18M18 6 6 18" />
-            </svg>
-          </button>
-        </div>
 
-        <div className="px-7 py-6">
           {announcement.body && (
-            <p className="whitespace-pre-line text-[14px] leading-relaxed text-ink/80">
+            <p className="mt-4 whitespace-pre-line text-[14px] leading-relaxed text-ink/75">
               {announcement.body}
             </p>
           )}
