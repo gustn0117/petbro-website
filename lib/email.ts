@@ -116,7 +116,7 @@ export function renderNewOrderNotification(input: {
     "세금계산서": input.issue_tax_invoice
       ? `발행 (${input.tax_email || ""})`
       : "발행 안 함",
-    "어드민": "https://petbro-website.hsweb.pics/admin/orders",
+    "어드민": "https://patbro-website.hsweb.pics/admin/orders",
   };
 
   return {
