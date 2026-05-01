@@ -28,6 +28,9 @@ export type PricingTier = {
   /** null = unlimited (top tier) */
   max_qty: number | null;
   price: number;
+  /** Manual margin override in %. If null, the storefront falls back
+   *  to (consumer_price − price) / consumer_price. */
+  margin?: number | null;
 };
 
 export type Product = {

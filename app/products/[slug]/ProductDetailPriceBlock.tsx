@@ -96,12 +96,15 @@ export default function ProductDetailPriceBlock({
         />
         {sorted.map((t, i) => {
           const isActive = current.tier === t;
+          // Manual margin if set, fallback to auto-calculated.
+          const margin =
+            t.margin != null ? t.margin : marginFor(consumerPrice, t.price);
           return (
             <PriceRow
               key={i}
               label={`${t.min_qty}개 이상 ${t.max_qty == null ? "" : `(${t.max_qty}개까지)`}`}
               value={t.price}
-              marginPct={marginFor(consumerPrice, t.price)}
+              marginPct={margin}
               active={isActive}
               divider={i < sorted.length - 1}
             />

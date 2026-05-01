@@ -34,9 +34,9 @@ export const EMPTY_PRODUCT: ProductFormValues = {
   price: 0,
   consumer_price: null,
   pricing_tiers: [
-    { min_qty: 10, max_qty: 29, price: 0 },
-    { min_qty: 30, max_qty: 49, price: 0 },
-    { min_qty: 50, max_qty: null, price: 0 },
+    { min_qty: 10, max_qty: 29, price: 0, margin: 30 },
+    { min_qty: 30, max_qty: 49, price: 0, margin: 35 },
+    { min_qty: 50, max_qty: null, price: 0, margin: 40 },
   ],
   min_order_quantity: 10,
   stock: 100,
@@ -421,25 +421,29 @@ function TierEditor({
   function add() {
     const last = tiers[tiers.length - 1];
     const nextMin = last ? (last.max_qty ?? last.min_qty) + 1 : 10;
-    onChange([...tiers, { min_qty: nextMin, max_qty: null, price: 0 }]);
+    onChange([
+      ...tiers,
+      { min_qty: nextMin, max_qty: null, price: 0, margin: null },
+    ]);
   }
 
   return (
     <div className="space-y-3">
-      <div className="overflow-hidden rounded-xl ring-1 ring-black/10">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-xl ring-1 ring-black/10">
+        <table className="w-full min-w-[640px] text-sm">
           <thead>
             <tr className="bg-[#fafafa] text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/55">
               <th className="px-4 py-3 text-left">구간 시작 (개)</th>
               <th className="px-4 py-3 text-left">구간 끝 (개, 비우면 무제한)</th>
               <th className="px-4 py-3 text-left">단가 (원)</th>
+              <th className="px-4 py-3 text-left">마진률 (%)</th>
               <th className="px-2 py-3 text-right" aria-label="작업"></th>
             </tr>
           </thead>
           <tbody>
             {tiers.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-xs text-ink/50">
+                <td colSpan={5} className="px-4 py-6 text-center text-xs text-ink/50">
                   구간이 비어 있습니다. '구간 추가'로 시작해주세요.
                 </td>
               </tr>
@@ -469,7 +473,7 @@ function TierEditor({
                             e.target.value === "" ? null : Number(e.target.value),
                         })
                       }
-                      className="w-32 rounded-lg border border-ink/12 px-3 py-2 text-sm outline-none focus:border-ink"
+                      className="w-28 rounded-lg border border-ink/12 px-3 py-2 text-sm outline-none focus:border-ink"
                     />
                   </td>
                   <td className="px-4 py-2.5">
@@ -481,7 +485,24 @@ function TierEditor({
                       onChange={(e) =>
                         update(i, { price: Math.max(0, Number(e.target.value)) })
                       }
-                      className="w-32 rounded-lg border border-ink/12 px-3 py-2 text-sm outline-none focus:border-ink"
+                      className="w-28 rounded-lg border border-ink/12 px-3 py-2 text-sm outline-none focus:border-ink"
+                    />
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      step={1}
+                      value={t.margin ?? ""}
+                      placeholder="자동"
+                      onChange={(e) =>
+                        update(i, {
+                          margin:
+                            e.target.value === "" ? null : Number(e.target.value),
+                        })
+                      }
+                      className="w-24 rounded-lg border border-ink/12 px-3 py-2 text-sm outline-none focus:border-ink"
                     />
                   </td>
                   <td className="px-2 py-2.5 text-right">
@@ -499,6 +520,10 @@ function TierEditor({
           </tbody>
         </table>
       </div>
+      <p className="text-xs text-ink/50">
+        마진률을 비우면 정찰제 판매가 기준으로 자동 계산됩니다 ((정찰제 −
+        단가) / 정찰제). 직접 입력하면 그 값으로 노출됩니다.
+      </p>
       <button
         type="button"
         onClick={add}
