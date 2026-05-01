@@ -30,6 +30,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <AdminNavLink href="/admin/orders" label="주문" />
             <AdminNavLink href="/admin/users" label="회원" />
             <AdminNavLink href="/admin/partners" label="파트너" />
+            <AdminNavLink href="/admin/announcements" label="공지" />
           </nav>
 
           <div className="flex items-center gap-3">

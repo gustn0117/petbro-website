@@ -88,7 +88,12 @@ export default function ProductDetailPriceBlock({
         {consumerPrice && (
           <PriceRow label="정찰제 판매가" value={consumerPrice} muted />
         )}
-        <PriceRow label="파트너 공급가" value={basePrice} divider={hasTiers} />
+        <PriceRow
+          label="파트너 공급가"
+          value={basePrice}
+          marginPct={marginFor(consumerPrice, basePrice)}
+          divider={hasTiers}
+        />
         {sorted.map((t, i) => {
           const isActive = current.tier === t;
           return (
@@ -96,6 +101,7 @@ export default function ProductDetailPriceBlock({
               key={i}
               label={`${t.min_qty}개 이상 ${t.max_qty == null ? "" : `(${t.max_qty}개까지)`}`}
               value={t.price}
+              marginPct={marginFor(consumerPrice, t.price)}
               active={isActive}
               divider={i < sorted.length - 1}
             />
@@ -183,47 +189,71 @@ export default function ProductDetailPriceBlock({
   );
 }
 
+function marginFor(
+  consumer: number | null | undefined,
+  supply: number,
+): number | null {
+  if (!consumer || consumer <= 0 || supply <= 0 || supply >= consumer) return null;
+  // Profit margin when reselling at the consumer price.
+  return Math.round(((consumer - supply) / consumer) * 100);
+}
+
 function PriceRow({
   label,
   value,
   muted,
   active,
   divider = true,
+  marginPct,
 }: {
   label: string;
   value: number;
   muted?: boolean;
   active?: boolean;
   divider?: boolean;
+  marginPct?: number | null;
 }) {
   return (
     <div
-      className={`flex items-baseline justify-between px-5 py-3 ${
+      className={`flex items-baseline justify-between gap-3 px-5 py-3 ${
         divider ? "border-b border-ink/8" : ""
       } ${active ? "bg-brand-50/70" : ""}`}
     >
       <dt
-        className={`text-sm ${
+        className={`flex flex-wrap items-center gap-2 text-sm ${
           active ? "font-semibold text-brand-800" : muted ? "text-ink/55" : "text-ink/70"
         }`}
       >
-        {label}
+        <span>{label}</span>
         {active && (
-          <span className="ml-2 inline-flex rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white">
+          <span className="inline-flex rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white">
             현재
           </span>
         )}
       </dt>
-      <dd
-        className={`font-mono ${
-          muted
-            ? "text-sm text-ink/45 line-through"
-            : active
-              ? "text-base font-bold text-brand-800"
-              : "text-base font-semibold text-ink"
-        }`}
-      >
-        {value.toLocaleString()}원
+      <dd className="flex items-baseline gap-2">
+        {marginPct != null && !muted && (
+          <span
+            className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+              active
+                ? "bg-brand text-white"
+                : "bg-brand/10 text-brand"
+            }`}
+          >
+            마진 {marginPct}%
+          </span>
+        )}
+        <span
+          className={`font-mono ${
+            muted
+              ? "text-sm text-ink/45 line-through"
+              : active
+                ? "text-base font-bold text-brand-800"
+                : "text-base font-semibold text-ink"
+          }`}
+        >
+          {value.toLocaleString()}원
+        </span>
       </dd>
     </div>
   );

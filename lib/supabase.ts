@@ -51,6 +51,19 @@ export type Product = {
   updated_at: string;
 };
 
+export type Announcement = {
+  id: string;
+  title: string;
+  body: string | null;
+  link_label: string | null;
+  link_url: string | null;
+  status: "active" | "draft";
+  starts_at: string | null;
+  ends_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Partner = {
   id: string;
   name: string;

@@ -3,6 +3,24 @@ import "./globals.css";
 import SiteChrome from "@/components/SiteChrome";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { getCurrentUser } from "@/lib/customer-auth";
+import { supabasePublic, type Announcement } from "@/lib/supabase";
+
+async function getActiveAnnouncement(): Promise<Announcement | null> {
+  try {
+    const now = new Date().toISOString();
+    const { data } = await supabasePublic
+      .from("announcements")
+      .select("*")
+      .eq("status", "active")
+      .or(`starts_at.is.null,starts_at.lte.${now}`)
+      .or(`ends_at.is.null,ends_at.gte.${now}`)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    return ((data && data[0]) as Announcement) || null;
+  } catch {
+    return null;
+  }
+}
 
 export const metadata: Metadata = {
   title: "PAT BRO 펫브로 — 위생을 최우선시 하는 애견간식 제조업체",
@@ -32,12 +50,17 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getCurrentUser();
+  const [user, announcement] = await Promise.all([
+    getCurrentUser(),
+    getActiveAnnouncement(),
+  ]);
   return (
     <html lang="ko">
       <body className="bg-white text-ink antialiased">
         <CartProvider>
-          <SiteChrome user={user}>{children}</SiteChrome>
+          <SiteChrome user={user} announcement={announcement}>
+            {children}
+          </SiteChrome>
         </CartProvider>
       </body>
     </html>

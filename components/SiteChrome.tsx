@@ -6,6 +6,8 @@ import Footer from "./Footer";
 import RevealOnScroll from "./RevealOnScroll";
 import CartDrawer from "./cart/CartDrawer";
 import PendingBanner from "./PendingBanner";
+import AnnouncementPopup from "./AnnouncementPopup";
+import type { Announcement } from "@/lib/supabase";
 
 export type ChromeUser = {
   id: string;
@@ -18,9 +20,11 @@ export type ChromeUser = {
 export default function SiteChrome({
   children,
   user,
+  announcement,
 }: {
   children: React.ReactNode;
   user: ChromeUser;
+  announcement: Announcement | null;
 }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
@@ -44,6 +48,7 @@ export default function SiteChrome({
       <Footer />
       <RevealOnScroll />
       <CartDrawer authed={!!user && user.status === "approved"} />
+      {announcement && <AnnouncementPopup announcement={announcement} />}
     </>
   );
 }
