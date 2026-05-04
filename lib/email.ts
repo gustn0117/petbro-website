@@ -19,47 +19,60 @@
 const TARGET_DEFAULT = "patbrokorea@gmail.com";
 
 function endpoint(): string {
-  // FormSubmit's /ajax/ variant rejects server-to-server requests
-  // ("Make sure you open this page through a web server"). The plain
-  // endpoint accepts urlencoded form bodies fine, just returns an HTML
-  // confirmation page instead of JSON — we ignore the response body.
   const token = process.env.FORMSUBMIT_TOKEN?.trim();
-  if (token) return `https://formsubmit.co/${token}`;
+  if (token) return `https://formsubmit.co/ajax/${token}`;
   const target = process.env.NOTIFICATION_EMAIL || TARGET_DEFAULT;
-  return `https://formsubmit.co/${encodeURIComponent(target)}`;
+  return `https://formsubmit.co/ajax/${encodeURIComponent(target)}`;
 }
 
 export async function sendNotification(input: {
   subject: string;
   fields: Record<string, string | number | null | undefined>;
 }): Promise<{ ok: boolean; error?: string }> {
-  // urlencoded form body (FormSubmit's standard expectation)
-  const params = new URLSearchParams();
-  params.set("_subject", input.subject);
-  params.set("_template", "table");
-  params.set("_captcha", "false");
+  const cleanFields: Record<string, string> = {};
   for (const [k, v] of Object.entries(input.fields)) {
     if (v == null || v === "") continue;
-    params.set(k, String(v));
+    cleanFields[k] = String(v);
   }
+
+  // The plain /<email> endpoint silently returns FormSubmit's homepage
+  // (HTTP 200, no email sent) for server-to-server POSTs. The /ajax/
+  // endpoint works as long as we send Origin + Referer headers — without
+  // Origin it returns "Make sure you open this page through a web server".
+  const site =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://patbro-website.hsweb.pics";
 
   try {
     const res = await fetch(endpoint(), {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        // Server-to-server fetch has no Origin header, but FormSubmit
-        // is happy with a Referer pointing at our site.
-        Referer:
-          process.env.NEXT_PUBLIC_SITE_URL ||
-          "https://patbro-website.hsweb.pics",
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Origin: site,
+        Referer: `${site}/`,
       },
-      body: params.toString(),
+      body: JSON.stringify({
+        _subject: input.subject,
+        _template: "table",
+        _captcha: "false",
+        ...cleanFields,
+      }),
     });
+    const text = await res.text();
     if (!res.ok) {
-      return { ok: false, error: `${res.status}` };
+      return { ok: false, error: `${res.status} ${text.slice(0, 200)}` };
     }
-    return { ok: true };
+    // FormSubmit returns {"success":"true",...} on delivery. Anything else
+    // (HTML page, success:"false") means the email did not go out.
+    try {
+      const json = JSON.parse(text);
+      if (json?.success === "true" || json?.success === true) {
+        return { ok: true };
+      }
+      return { ok: false, error: `bad response: ${text.slice(0, 200)}` };
+    } catch {
+      return { ok: false, error: `non-json response: ${text.slice(0, 200)}` };
+    }
   } catch (e: any) {
     return { ok: false, error: e?.message || "fetch failed" };
   }
